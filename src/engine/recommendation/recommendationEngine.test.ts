@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { analyze } from "./recommendationEngine"
+import { analyze, analyzeDiscardPickup } from "./recommendationEngine"
 import type { Card } from "@/types"
 
 describe("analyze", () => {
@@ -98,5 +98,69 @@ describe("analyze", () => {
     const result = analyze(hand, discardPile, [], null, null)
     expect(result).toBeDefined()
     expect(result.discard).not.toBeNull()
+  })
+})
+
+describe("analyzeDiscardPickup", () => {
+  it("detects sequence opportunity from discard pile", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 2 },
+      { suit: "spade", rank: 3 },
+      { suit: "heart", rank: 10 },
+      { suit: "heart", rank: 11 },
+      { suit: "diamond", rank: 7 },
+      { suit: "club", rank: 9 },
+      { suit: "club", rank: 13 },
+    ]
+    const discardPile: Card[] = [
+      { suit: "diamond", rank: 1 },
+      { suit: "club", rank: 2 },
+      { suit: "heart", rank: 5 },
+      { suit: "spade", rank: 4 },
+    ]
+    const result = analyzeDiscardPickup(hand, discardPile, [], null, null)
+    expect(result.bestOption).not.toBeNull()
+    expect(result.bestOption!.targetCard).toEqual({ suit: "spade", rank: 4 })
+    expect(result.bestOption!.formedMeld.type).toBe("sequence")
+  })
+
+  it("detects set opportunity from discard pile", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 7 },
+      { suit: "heart", rank: 7 },
+      { suit: "diamond", rank: 3 },
+      { suit: "club", rank: 9 },
+      { suit: "club", rank: 13 },
+      { suit: "heart", rank: 1 },
+      { suit: "diamond", rank: 11 },
+    ]
+    const discardPile: Card[] = [
+      { suit: "spade", rank: 2 },
+      { suit: "club", rank: 7 },
+    ]
+    const result = analyzeDiscardPickup(hand, discardPile, [], null, null)
+    expect(result.bestOption).not.toBeNull()
+    expect(result.bestOption!.targetCard).toEqual({ suit: "club", rank: 7 })
+    expect(result.bestOption!.formedMeld.type).toBe("set")
+  })
+
+  it("returns bestOption=null when no meld opportunity exists", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 1 },
+      { suit: "heart", rank: 5 },
+      { suit: "diamond", rank: 9 },
+      { suit: "club", rank: 13 },
+      { suit: "spade", rank: 7 },
+      { suit: "heart", rank: 3 },
+      { suit: "diamond", rank: 11 },
+    ]
+    const discardPile: Card[] = [
+      { suit: "club", rank: 2 },
+      { suit: "club", rank: 6 },
+      { suit: "club", rank: 10 },
+    ]
+    const result = analyzeDiscardPickup(hand, discardPile, [], null, null)
+    expect(result.bestOption).toBeNull()
+    expect(result.options).toHaveLength(0)
   })
 })
