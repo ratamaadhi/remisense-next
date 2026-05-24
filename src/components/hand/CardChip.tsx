@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import type { Card } from "@/types"
-import { formatCard } from "@/engine/cards/cardUtils"
-import { isJoker } from "@/engine/melds/meldDetector"
-import { cn } from "@/lib/utils"
+import type { Card } from "@/types";
+import { formatCard } from "@/engine/cards/cardUtils";
+import { isJoker } from "@/engine/melds/meldDetector";
+import { cn } from "@/lib/utils";
 
 type CardChipProps = {
-  card: Card
-  jokerRank?: number | null
-  onClick?: () => void
-  disabled?: boolean
-  highlighted?: boolean
-  variant?: "default" | "danger" | "success"
-}
+  card: Card;
+  jokerRank?: number | null;
+  onClick?: () => void;
+  disabled?: boolean;
+  highlighted?: boolean;
+  variant?: "default" | "danger" | "success";
+};
 
 export function CardChip({
   card,
@@ -22,8 +22,8 @@ export function CardChip({
   highlighted = false,
   variant = "default",
 }: CardChipProps) {
-  const isRed = card.suit === "heart" || card.suit === "diamond"
-  const isWild = isJoker(card, jokerRank)
+  const isRed = card.suit === "heart" || card.suit === "diamond";
+  const isWild = isJoker(card, jokerRank);
 
   return (
     <button
@@ -42,12 +42,12 @@ export function CardChip({
         disabled
           ? "opacity-40 cursor-not-allowed"
           : "cursor-pointer hover:shadow-md hover:scale-105",
-        highlighted && "ring-2 ring-blue-400"
+        highlighted && "ring-2 ring-blue-400",
       )}
       title={isWild ? "Joker" : formatCard(card)}
     >
       {formatCard(card)}
       {isWild && <span className="ml-1 text-xs">★</span>}
     </button>
-  )
+  );
 }

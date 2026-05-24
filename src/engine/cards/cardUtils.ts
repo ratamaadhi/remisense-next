@@ -74,3 +74,16 @@ export function isJoker(card: Card, jokerRank: number | null): boolean {
   if (jokerRank === null) return false
   return card.rank === jokerRank
 }
+
+/**
+ * Determines if a group of cards forms a sequence meld.
+ * A sequence = all non-joker cards share the same suit.
+ * A set = all non-joker cards share the same rank (different suits).
+ * Returns true if the meld is a sequence.
+ */
+export function isMeldSequence(cards: Card[], jokerRank: number | null): boolean {
+  const nonJokers = cards.filter((c) => !isJoker(c, jokerRank))
+  if (nonJokers.length < 2) return false
+  const firstSuit = nonJokers[0].suit
+  return nonJokers.every((c) => c.suit === firstSuit)
+}

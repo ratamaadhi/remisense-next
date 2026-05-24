@@ -222,6 +222,9 @@ Tambah test untuk actions baru:
 
 - Maksimal kartu yang bisa dilihat dari tumpukan buangan: **7 kartu**
 - Kartu target wajib langsung membentuk meld — tidak boleh ambil kartu buangan tanpa tujuan meld
+- **Aturan jenis meld untuk pickup dari buangan:**
+  - Jika pemain **belum memiliki sequence meld** di meja (`visibleMelds`) → kartu target hanya boleh membentuk **sequence** (kartu berurutan satu suit), TIDAK boleh set
+  - Jika pemain **sudah memiliki minimal satu sequence meld** di meja → kartu target boleh membentuk **sequence ATAU set**
 - Satu aksi pengambilan hanya menghasilkan **satu meld baru** (meld dari kartu target)
 - Kartu bonus yang ikut terbawa bisa dipakai untuk meld lain di giliran yang sama, tapi ini tidak dimodelkan secara eksplisit di engine (user yang memutuskan)
 - `drawDeckScore` adalah estimasi sederhana berbasis `nearMelds` yang sudah ada — bukan simulasi Monte Carlo

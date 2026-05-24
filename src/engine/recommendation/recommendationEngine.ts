@@ -1,5 +1,5 @@
 import type { Card, Recommendation, GameContext, NearMeld, DiscardPickupOption, DiscardPickupRecommendation } from "@/types"
-import { cardEquals } from "@/engine/cards/cardUtils"
+import { cardEquals, isMeldSequence } from "@/engine/cards/cardUtils"
 import { isJoker, detectNearMelds } from "@/engine/melds/meldDetector"
 import { solveOptimalMelds } from "@/engine/solver/combinationSolver"
 import { getRemainingCards, getCompletionProbability, getTopNDiscards } from "@/engine/probability/probabilityTracker"
@@ -99,6 +99,10 @@ export function analyzeDiscardPickup(
     return { options: [], bestOption: null, drawDeckScore: 0 }
   }
 
+  // Check if player already has a sequence meld in visibleMelds
+  // If not, only sequence melds are allowed for pickup from discard
+  const hasSequenceMeld = visibleMelds.some((meld) => isMeldSequence(meld, jokerRank))
+
   // Compute drawDeckScore baseline
   const unseenCards = getRemainingCards(hand, discardPile, visibleMelds, jokerIndicator)
   const nearMelds = detectNearMelds(hand, jokerRank).map((nm) => ({
@@ -128,6 +132,10 @@ export function analyzeDiscardPickup(
     )
 
     if (!meldWithTarget) continue
+
+    // Enforce sequence-only constraint:
+    // If player doesn't have a sequence meld yet, only sequence pickups are allowed
+    if (!hasSequenceMeld && meldWithTarget.type === "set") continue
 
     // Calculate netScore
     const meldValue = meldWithTarget.cards.length * 10

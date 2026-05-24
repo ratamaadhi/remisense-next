@@ -124,7 +124,7 @@ describe("analyzeDiscardPickup", () => {
     expect(result.bestOption!.formedMeld.type).toBe("sequence")
   })
 
-  it("detects set opportunity from discard pile", () => {
+  it("blocks set opportunity when player has no sequence meld", () => {
     const hand: Card[] = [
       { suit: "spade", rank: 7 },
       { suit: "heart", rank: 7 },
@@ -138,7 +138,30 @@ describe("analyzeDiscardPickup", () => {
       { suit: "spade", rank: 2 },
       { suit: "club", rank: 7 },
     ]
+    // No visibleMelds → set pickup blocked
     const result = analyzeDiscardPickup(hand, discardPile, [], null, null)
+    expect(result.bestOption).toBeNull()
+  })
+
+  it("allows set opportunity when player already has a sequence meld", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 7 },
+      { suit: "heart", rank: 7 },
+      { suit: "diamond", rank: 3 },
+      { suit: "club", rank: 9 },
+      { suit: "club", rank: 13 },
+      { suit: "heart", rank: 1 },
+      { suit: "diamond", rank: 11 },
+    ]
+    const discardPile: Card[] = [
+      { suit: "spade", rank: 2 },
+      { suit: "club", rank: 7 },
+    ]
+    // Player has a sequence meld → set pickup allowed
+    const visibleMelds: Card[][] = [
+      [{ suit: "heart", rank: 4 }, { suit: "heart", rank: 5 }, { suit: "heart", rank: 6 }],
+    ]
+    const result = analyzeDiscardPickup(hand, discardPile, visibleMelds, null, null)
     expect(result.bestOption).not.toBeNull()
     expect(result.bestOption!.targetCard).toEqual({ suit: "club", rank: 7 })
     expect(result.bestOption!.formedMeld.type).toBe("set")
