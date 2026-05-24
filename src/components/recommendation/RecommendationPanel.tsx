@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useGameStore } from "@/store/gameStore"
 import { CardChip } from "@/components/hand/CardChip"
-import { analyze } from "@/engine/recommendation/recommendationEngine"
+import { analyze, analyzeDiscardPickup } from "@/engine/recommendation/recommendationEngine"
+import type { DiscardPickupRecommendation } from "@/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
@@ -26,6 +27,11 @@ export function RecommendationPanel() {
     }
     const result = analyze(hand, discardPile, visibleMelds, jokerRank, jokerIndicator)
     setRecommendation(result)
+  }, [hand, discardPile, visibleMelds, jokerRank, jokerIndicator, gamePhase])
+
+  const pickupRec: DiscardPickupRecommendation | null = useMemo(() => {
+    if (gamePhase !== "playing" || hand.length === 0 || discardPile.length === 0) return null
+    return analyzeDiscardPickup(hand, discardPile, visibleMelds, jokerRank, jokerIndicator)
   }, [hand, discardPile, visibleMelds, jokerRank, jokerIndicator, gamePhase])
 
   if (gamePhase !== "playing") {
@@ -60,6 +66,60 @@ export function RecommendationPanel() {
         <CardTitle className="text-base">Rekomendasi</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Discard pickup opportunity */}
+        {pickupRec?.bestOption && pickupRec.bestOption.worthIt && (
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-medium px-2 py-0.5 rounded bg-green-100 text-green-700">
+                Worth It ✓
+              </span>
+              <span className="text-sm font-medium text-blue-800">Peluang Ambil Buangan</span>
+            </div>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center gap-1 flex-wrap">
+                <span className="text-muted-foreground">Target:</span>
+                <CardChip
+                  card={pickupRec.bestOption.targetCard}
+                  jokerRank={jokerRank}
+                  disabled
+                  highlighted
+                />
+                <span className="text-muted-foreground ml-1">
+                  (posisi #{pickupRec.bestOption.targetIndex}, ambil {pickupRec.bestOption.cardsTaken.length} kartu)
+                </span>
+              </div>
+              <div className="flex items-center gap-1 flex-wrap">
+                <span className="text-muted-foreground">Meld:</span>
+                {pickupRec.bestOption.formedMeld.cards.map((c) => (
+                  <CardChip
+                    key={`${c.suit}-${c.rank}`}
+                    card={c}
+                    jokerRank={jokerRank}
+                    variant="success"
+                    disabled
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-1 flex-wrap">
+                <span className="text-muted-foreground">Buang setelahnya:</span>
+                <CardChip
+                  card={pickupRec.bestOption.suggestedDiscard}
+                  jokerRank={jokerRank}
+                  variant="danger"
+                  disabled
+                />
+              </div>
+              <div className="mt-1 space-y-0.5">
+                {pickupRec.bestOption.reasons.map((r, i) => (
+                  <div key={i} className="flex items-start gap-1 text-blue-700">
+                    <span>&bull;</span><span>{r}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Discard suggestion */}
         <div className="p-3 bg-red-50 border border-red-200 rounded-md">
           <div className="text-sm font-medium text-red-800 mb-2">Buang:</div>
