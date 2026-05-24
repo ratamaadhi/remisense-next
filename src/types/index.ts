@@ -50,3 +50,22 @@ export type GameSetup = {
 }
 
 export type GamePhase = "setup" | "playing"
+
+/** Satu peluang pengambilan kartu dari tumpukan buangan */
+export type DiscardPickupOption = {
+  targetCard: Card
+  targetIndex: number
+  cardsTaken: Card[]
+  formedMeld: Meld
+  suggestedDiscard: Card
+  netScore: number
+  worthIt: boolean
+  reasons: string[]
+}
+
+/** Hasil analisis semua peluang pengambilan dari tumpukan buangan */
+export type DiscardPickupRecommendation = {
+  options: DiscardPickupOption[]
+  bestOption: DiscardPickupOption | null
+  drawDeckScore: number
+}
