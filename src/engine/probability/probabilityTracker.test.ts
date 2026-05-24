@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { getRemainingCards, getCompletionProbability } from "./probabilityTracker"
+import { getRemainingCards, getCompletionProbability, getTopNDiscards } from "./probabilityTracker"
 import type { Card } from "@/types"
 
 describe("getRemainingCards", () => {
@@ -119,5 +119,36 @@ describe("getCompletionProbability", () => {
     ]
     const prob = getCompletionProbability(neededCards, remaining, null)
     expect(prob).toBeCloseTo(1 / 2, 2)
+  })
+})
+
+describe("getTopNDiscards", () => {
+  it("returns top N cards from discard pile (last = top)", () => {
+    const pile: Card[] = [
+      { suit: "spade", rank: 1 },
+      { suit: "heart", rank: 2 },
+      { suit: "diamond", rank: 3 },
+      { suit: "club", rank: 4 },
+      { suit: "spade", rank: 5 },
+    ]
+    const top3 = getTopNDiscards(pile, 3)
+    expect(top3).toEqual([
+      { suit: "diamond", rank: 3 },
+      { suit: "club", rank: 4 },
+      { suit: "spade", rank: 5 },
+    ])
+  })
+
+  it("returns all cards if pile.length < n", () => {
+    const pile: Card[] = [
+      { suit: "spade", rank: 1 },
+      { suit: "heart", rank: 2 },
+    ]
+    const top7 = getTopNDiscards(pile, 7)
+    expect(top7).toEqual(pile)
+  })
+
+  it("returns empty array if pile is empty", () => {
+    expect(getTopNDiscards([], 7)).toEqual([])
   })
 })

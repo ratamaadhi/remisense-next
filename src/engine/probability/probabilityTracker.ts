@@ -67,3 +67,14 @@ export function getCompletionProbability(
 
   return totalMatches / remaining.length
 }
+
+/**
+ * Returns N kartu teratas dari tumpukan buangan.
+ * Index terakhir array discardPile = kartu paling atas.
+ * Returns semua kartu jika pile.length < n.
+ */
+export function getTopNDiscards(discardPile: Card[], n: number): Card[] {
+  if (discardPile.length === 0) return []
+  const startIndex = Math.max(0, discardPile.length - n)
+  return discardPile.slice(startIndex)
+}
