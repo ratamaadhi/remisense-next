@@ -4,6 +4,18 @@ import { isJoker, cardEquals } from "@/engine/cards/cardUtils"
 export { isJoker }
 
 /**
+ * Returns true if a rank transition is forbidden in sequences.
+ * - A (rank 1) cannot connect to rank 2 → blocks A-2-3 type sequences
+ * - rank 10 cannot connect to J (rank 11) → blocks 10-J-Q-K type sequences
+ * Valid sequence groups: ranks 2–10, and ranks 11–13 (J-Q-K).
+ */
+function isForbiddenSequenceTransition(fromRank: number, toRank: number): boolean {
+  if (fromRank === 1 && toRank === 2) return true
+  if (fromRank === 10 && toRank === 11) return true
+  return false
+}
+
+/**
  * Detects all possible sets in the hand.
  * NOTE: Returned melds may share joker cards. The combination solver
  * handles conflict resolution.
@@ -63,13 +75,16 @@ export function detectSequences(hand: Card[], jokerRank: number | null): Meld[] 
       while (j < sorted.length) {
         const nextCard = sorted[j]
         if (nextCard.rank === currentRank + 1) {
+          if (isForbiddenSequenceTransition(currentRank, nextCard.rank)) break
           run.push(nextCard)
           currentRank = nextCard.rank
           j++
         } else if (nextCard.rank === currentRank + 2 && jokers.length - usedJokers > 0) {
+          const filledRank = currentRank + 1
+          if (isForbiddenSequenceTransition(currentRank, filledRank)) break
           run.push(jokers[usedJokers])
           usedJokers++
-          currentRank = currentRank + 1
+          currentRank = filledRank
           // don't advance j — re-check nextCard at new currentRank
         } else {
           break
@@ -134,6 +149,7 @@ export function detectNearMelds(hand: Card[], jokerRank: number | null): NearMel
       const diff = sorted[i + 1].rank - sorted[i].rank
 
       if (diff === 1) {
+        if (isForbiddenSequenceTransition(sorted[i].rank, sorted[i + 1].rank)) continue
         const neededCards: Card[] = []
         if (sorted[i].rank > 1) {
           neededCards.push({ suit: suit as Card["suit"], rank: sorted[i].rank - 1 })
@@ -148,7 +164,10 @@ export function detectNearMelds(hand: Card[], jokerRank: number | null): NearMel
           completionProbability: 0,
         })
       } else if (diff === 2) {
-        const neededCards: Card[] = [{ suit: suit as Card["suit"], rank: sorted[i].rank + 1 }]
+        const gapRank = sorted[i].rank + 1
+        if (isForbiddenSequenceTransition(sorted[i].rank, gapRank)) continue
+        if (isForbiddenSequenceTransition(gapRank, sorted[i + 1].rank)) continue
+        const neededCards: Card[] = [{ suit: suit as Card["suit"], rank: gapRank }]
         nearMelds.push({
           cards: [sorted[i], sorted[i + 1]],
           type: "near-sequence",

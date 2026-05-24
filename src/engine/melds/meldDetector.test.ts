@@ -97,6 +97,69 @@ describe("detectSequences", () => {
     expect(seqs).toHaveLength(1)
     expect(seqs[0].cards).toHaveLength(3)
   })
+
+  it("does not detect A-2-3 as a valid sequence", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 1 }, // A
+      { suit: "spade", rank: 2 },
+      { suit: "spade", rank: 3 },
+    ]
+    const seqs = detectSequences(hand, null)
+    expect(seqs).toHaveLength(0)
+  })
+
+  it("does not detect 10-J-Q as a valid sequence", () => {
+    const hand: Card[] = [
+      { suit: "heart", rank: 10 },
+      { suit: "heart", rank: 11 }, // J
+      { suit: "heart", rank: 12 }, // Q
+    ]
+    const seqs = detectSequences(hand, null)
+    expect(seqs).toHaveLength(0)
+  })
+
+  it("does not detect 8-9-10-J crossing as valid", () => {
+    const hand: Card[] = [
+      { suit: "diamond", rank: 8 },
+      { suit: "diamond", rank: 9 },
+      { suit: "diamond", rank: 10 },
+      { suit: "diamond", rank: 11 }, // J
+    ]
+    const seqs = detectSequences(hand, null)
+    // 8-9-10 is valid, but no sequence may cross into J
+    expect(seqs.every((s) => s.cards.every((c) => c.rank <= 10))).toBe(true)
+  })
+
+  it("still detects J-Q-K as a valid sequence", () => {
+    const hand: Card[] = [
+      { suit: "club", rank: 11 }, // J
+      { suit: "club", rank: 12 }, // Q
+      { suit: "club", rank: 13 }, // K
+    ]
+    const seqs = detectSequences(hand, null)
+    expect(seqs).toHaveLength(1)
+    expect(seqs[0].cards).toHaveLength(3)
+  })
+
+  it("does not use joker to bridge A-2 forbidden boundary", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 1 },  // A
+      { suit: "club", rank: 5 },   // joker rank = 5, would fill rank 2
+      { suit: "spade", rank: 3 },
+    ]
+    const seqs = detectSequences(hand, 5)
+    expect(seqs).toHaveLength(0)
+  })
+
+  it("does not use joker to bridge 10-J forbidden boundary", () => {
+    const hand: Card[] = [
+      { suit: "heart", rank: 9 },
+      { suit: "club", rank: 5 },   // joker rank = 5, would fill rank 10
+      { suit: "heart", rank: 11 }, // J
+    ]
+    const seqs = detectSequences(hand, 5)
+    expect(seqs).toHaveLength(0)
+  })
 })
 
 describe("detectNearMelds", () => {
