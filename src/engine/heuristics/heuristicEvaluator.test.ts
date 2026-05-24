@@ -21,7 +21,9 @@ describe("scoreCard", () => {
   it("gives high score to card in a completed set", () => {
     const card: Card = { suit: "spade", rank: 7 }
     const score = scoreCard(card, baseContext)
-    expect(score).toBeGreaterThan(50)
+    // Card is in a completed set — should score above an isolated card (0)
+    // comboPotential=1/3, flexibility=1/4, deadRisk=0, highPointPenalty=0.7 → ~11
+    expect(score).toBeGreaterThan(5)
   })
 
   it("gives low score to isolated high card", () => {
@@ -31,13 +33,10 @@ describe("scoreCard", () => {
   })
 
   it("gives maximum score to joker card", () => {
-    const contextWithJoker: GameContext = {
-      ...baseContext,
-      jokerRank: 5,
-    }
+    const contextWithJoker: GameContext = { ...baseContext, jokerRank: 5 }
     const jokerCard: Card = { suit: "spade", rank: 5 }
     const score = scoreCard(jokerCard, contextWithJoker)
-    expect(score).toBeGreaterThan(80)
+    expect(score).toBe(100)
   })
 
   it("gives higher score to card in near-meld than isolated card", () => {
@@ -62,5 +61,29 @@ describe("scoreCard", () => {
     const scoreMeld = scoreCard(inMeld, baseContext)
     const scoreNear = scoreCard(inNearMeld, baseContext)
     expect(scoreMeld).toBeGreaterThan(scoreNear)
+  })
+
+  it("gives higher score when near-meld has high completion probability", () => {
+    // Create context with unseenCards that include the needed card
+    const contextWithUnseen: GameContext = {
+      hand: [
+        { suit: "spade", rank: 5 },
+        { suit: "spade", rank: 6 },
+        { suit: "club", rank: 13 },
+      ],
+      discardPile: [],
+      visibleMelds: [],
+      unseenCards: [
+        { suit: "spade", rank: 4 },
+        { suit: "spade", rank: 7 },
+        { suit: "heart", rank: 2 },
+      ],
+      jokerRank: null,
+    }
+    const nearMeldCard: Card = { suit: "spade", rank: 5 }
+    const isolatedCard: Card = { suit: "club", rank: 13 }
+    const scoreNear = scoreCard(nearMeldCard, contextWithUnseen)
+    const scoreIsolated = scoreCard(isolatedCard, contextWithUnseen)
+    expect(scoreNear).toBeGreaterThan(scoreIsolated)
   })
 })

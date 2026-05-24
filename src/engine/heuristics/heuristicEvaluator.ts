@@ -1,6 +1,7 @@
 import type { Card, GameContext } from "@/types"
-import { cardEquals } from "@/engine/cards/cardUtils"
+import { cardEquals, getRankValue } from "@/engine/cards/cardUtils"
 import { isJoker, detectSets, detectSequences, detectNearMelds } from "@/engine/melds/meldDetector"
+import { getRemainingCards, getCompletionProbability } from "@/engine/probability/probabilityTracker"
 
 /**
  * Scores a card based on its strategic value in the current hand.
@@ -15,7 +16,7 @@ import { isJoker, detectSets, detectSequences, detectNearMelds } from "@/engine/
  * Final score is clamped to [0, 100].
  */
 export function scoreCard(card: Card, context: GameContext): number {
-  const { hand, jokerRank } = context
+  const { hand, discardPile, visibleMelds, unseenCards, jokerRank } = context
 
   // Joker cards get maximum score — never discard a joker
   if (isJoker(card, jokerRank)) {
@@ -25,15 +26,24 @@ export function scoreCard(card: Card, context: GameContext): number {
   const allSets = detectSets(hand, jokerRank)
   const allSequences = detectSequences(hand, jokerRank)
   const allMelds = [...allSets, ...allSequences]
-  const nearMelds = detectNearMelds(hand, jokerRank)
+  const rawNearMelds = detectNearMelds(hand, jokerRank)
 
-  // comboPotential: fraction of detected melds this card participates in (0-1)
+  // Populate completionProbability using probability tracker
+  // Use unseenCards if available, otherwise compute from context
+  const remaining = unseenCards.length > 0
+    ? unseenCards
+    : getRemainingCards(hand, discardPile, visibleMelds, null)
+
+  const nearMelds = rawNearMelds.map((nm) => ({
+    ...nm,
+    completionProbability: getCompletionProbability(nm.neededCards, remaining, jokerRank),
+  }))
+
+  // comboPotential: how many completed melds this card participates in, normalized by cap of 3
   const meldsWithCard = allMelds.filter((m) =>
     m.cards.some((c) => cardEquals(c, card))
   )
-  const comboPotential = allMelds.length > 0
-    ? Math.min(meldsWithCard.length / allMelds.length, 1.0)
-    : 0
+  const comboPotential = Math.min(meldsWithCard.length / 3, 1.0)
 
   // completionChance: average completionProbability of near-melds involving this card (0-1)
   const nearMeldsWithCard = nearMelds.filter((nm) =>
@@ -43,7 +53,8 @@ export function scoreCard(card: Card, context: GameContext): number {
     ? nearMeldsWithCard.reduce((sum, nm) => sum + nm.completionProbability, 0) / nearMeldsWithCard.length
     : 0
 
-  // flexibility: normalized count of combos (melds + near-melds) this card can form (0-1)
+  // flexibility: normalized count of combos this card can form
+  // Cap of 4 = a card can realistically be in at most ~4 different meld combinations
   const totalCombos = meldsWithCard.length + nearMeldsWithCard.length
   const flexibility = Math.min(totalCombos / 4, 1.0)
 
@@ -52,8 +63,10 @@ export function scoreCard(card: Card, context: GameContext): number {
   const isInNearMeld = nearMeldsWithCard.length > 0
   const deadRisk = isInMeld ? 0 : isInNearMeld ? 0.3 : 1.0
 
-  // highPointPenalty: normalized rank penalty (0-1), higher for face cards
-  const highPointPenalty = card.rank >= 10 ? card.rank / 13 : card.rank / 26
+  // highPointPenalty: based on actual game point value via getRankValue, normalized to [0, 1]
+  // getRankValue returns 1-10 for number cards, 10 for face cards
+  const pointValue = getRankValue(card)
+  const highPointPenalty = pointValue / 10
 
   const score =
     (comboPotential * 40) +
