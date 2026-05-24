@@ -81,10 +81,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   removeFromHand: (card) => {
     const state = get()
     const newHand = state.hand.filter((c) => !cardEquals(c, card))
-    set({
-      hand: newHand,
-      discardPile: [...state.discardPile, card],
-    })
+    if (newHand.length === state.hand.length) return // card wasn't in hand
+    set({ hand: newHand, discardPile: [...state.discardPile, card] })
   },
 
   addToDiscardPile: (card) => {
@@ -94,6 +92,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   addMeldGroup: (cards) => {
+    if (cards.length === 0) return
     const state = get()
     const anyUsed = cards.some((card) => isCardUsed(card, state))
     if (anyUsed) return
@@ -102,6 +101,8 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   removeMeldGroup: (index) => {
     const state = get()
+    // Cards from removed melds are freed from all zones.
+    // They can be re-added to hand or discard via addToHand/addToDiscardPile.
     set({ visibleMelds: state.visibleMelds.filter((_, i) => i !== index) })
   },
 

@@ -90,6 +90,42 @@ describe("gameStore", () => {
       useGameStore.getState().removeMeldGroup(0)
       expect(useGameStore.getState().visibleMelds).toHaveLength(0)
     })
+
+    it("does not add to discard when removing card not in hand", () => {
+      const card = { suit: "spade" as const, rank: 7 }
+      useGameStore.getState().removeFromHand(card) // card not in hand
+      expect(useGameStore.getState().discardPile).not.toContainEqual(card)
+      expect(useGameStore.getState().hand).toHaveLength(0)
+    })
+
+    it("prevents adding meld with card already in hand", () => {
+      useGameStore.getState().addToHand({ suit: "spade", rank: 9 })
+      const meld = [
+        { suit: "spade" as const, rank: 9 }, // already in hand
+        { suit: "heart" as const, rank: 9 },
+        { suit: "diamond" as const, rank: 9 },
+      ]
+      useGameStore.getState().addMeldGroup(meld)
+      expect(useGameStore.getState().visibleMelds).toHaveLength(0)
+    })
+
+    it("rejects empty meld group", () => {
+      useGameStore.getState().addMeldGroup([])
+      expect(useGameStore.getState().visibleMelds).toHaveLength(0)
+    })
+
+    it("freed meld cards can be re-added to hand", () => {
+      const meld = [
+        { suit: "spade" as const, rank: 9 },
+        { suit: "heart" as const, rank: 9 },
+        { suit: "diamond" as const, rank: 9 },
+      ]
+      useGameStore.getState().addMeldGroup(meld)
+      useGameStore.getState().removeMeldGroup(0)
+      // After removal, card should be addable to hand again
+      useGameStore.getState().addToHand({ suit: "spade", rank: 9 })
+      expect(useGameStore.getState().hand).toContainEqual({ suit: "spade", rank: 9 })
+    })
   })
 
   describe("resetGame", () => {
