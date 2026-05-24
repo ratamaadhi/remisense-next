@@ -66,12 +66,12 @@ export function analyze(
     ? generateReasons(discard, context, allocation, nearMelds)
     : ["Semua kartu adalah joker"]
 
-  // Identify risky cards: isolated high-rank cards (score < 15 and rank >= 10)
-  const riskyCards = hand.filter((card) => {
-    if (isJoker(card, jokerRank)) return false
-    const score = scoreCard(card, context)
-    return score < 15 && card.rank >= 10
-  })
+  // Identify risky cards: high-rank cards with low strategic value (score < 15 and rank >= 10)
+  // Note: score < 15 captures cards that are isolated OR in near-melds with very low completion probability
+  // Reuse cardScores already computed above to avoid redundant scoreCard calls
+  const riskyCards = cardScores
+    .filter(({ card, score }) => !isJoker(card, jokerRank) && score < 15 && card.rank >= 10)
+    .map(({ card }) => card)
 
   return {
     discard,
@@ -82,6 +82,9 @@ export function analyze(
   }
 }
 
+// Note: allocation.nearMelds is not used here because nearMelds parameter
+// already contains near-melds with real completionProbability values
+// (allocation.nearMelds has completionProbability=0)
 function generateReasons(
   discard: Card,
   context: GameContext,
@@ -115,6 +118,10 @@ function generateReasons(
     if (avgProb < 0.15) {
       reasons.push(
         `Probabilitas melengkapi kombinasi rendah (${Math.round(avgProb * 100)}%)`
+      )
+    } else {
+      reasons.push(
+        `Peluang melengkapi kombinasi tidak cukup tinggi (${Math.round(avgProb * 100)}%)`
       )
     }
   }
