@@ -1,12 +1,13 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo } from "react"
-import { useGameStore } from "@/store/gameStore"
-import { CardChip } from "@/components/hand/CardChip"
-import { analyze, analyzeDiscardPickup } from "@/engine/recommendation/recommendationEngine"
-import type { DiscardPickupRecommendation } from "@/types"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { useEffect, useMemo } from "react";
+import { Check } from "lucide-react";
+import { useGameStore } from "@/store/gameStore";
+import { CardChip } from "@/components/hand/CardChip";
+import { analyze, analyzeDiscardPickup } from "@/engine/recommendation/recommendationEngine";
+import type { DiscardPickupRecommendation } from "@/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export function RecommendationPanel() {
   const {
@@ -18,21 +19,21 @@ export function RecommendationPanel() {
     gamePhase,
     recommendation,
     setRecommendation,
-  } = useGameStore()
+  } = useGameStore();
 
   useEffect(() => {
     if (gamePhase !== "playing" || hand.length === 0) {
-      setRecommendation(null)
-      return
+      setRecommendation(null);
+      return;
     }
-    const result = analyze(hand, discardPile, visibleMelds, jokerRank, jokerIndicator)
-    setRecommendation(result)
-  }, [hand, discardPile, visibleMelds, jokerRank, jokerIndicator, gamePhase])
+    const result = analyze(hand, discardPile, visibleMelds, jokerRank, jokerIndicator);
+    setRecommendation(result);
+  }, [hand, discardPile, visibleMelds, jokerRank, jokerIndicator, gamePhase]);
 
   const pickupRec: DiscardPickupRecommendation | null = useMemo(() => {
-    if (gamePhase !== "playing" || hand.length === 0 || discardPile.length === 0) return null
-    return analyzeDiscardPickup(hand, discardPile, visibleMelds, jokerRank, jokerIndicator)
-  }, [hand, discardPile, visibleMelds, jokerRank, jokerIndicator, gamePhase])
+    if (gamePhase !== "playing" || hand.length === 0 || discardPile.length === 0) return null;
+    return analyzeDiscardPickup(hand, discardPile, visibleMelds, jokerRank, jokerIndicator);
+  }, [hand, discardPile, visibleMelds, jokerRank, jokerIndicator, gamePhase]);
 
   if (gamePhase !== "playing") {
     return (
@@ -41,10 +42,12 @@ export function RecommendationPanel() {
           <CardTitle className="text-base">Rekomendasi</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Selesaikan setup permainan untuk melihat rekomendasi.</p>
+          <p className="text-sm text-muted-foreground">
+            Selesaikan setup permainan untuk melihat rekomendasi.
+          </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (!recommendation || hand.length === 0) {
@@ -54,10 +57,12 @@ export function RecommendationPanel() {
           <CardTitle className="text-base">Rekomendasi</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Tambahkan kartu ke tangan untuk melihat rekomendasi.</p>
+          <p className="text-sm text-muted-foreground">
+            Tambahkan kartu ke tangan untuk melihat rekomendasi.
+          </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -85,7 +90,8 @@ export function RecommendationPanel() {
                   highlighted
                 />
                 <span className="text-muted-foreground ml-1">
-                  (posisi #{pickupRec.bestOption.targetIndex}, ambil {pickupRec.bestOption.cardsTaken.length} kartu)
+                  (posisi #{pickupRec.bestOption.targetIndex}, ambil{" "}
+                  {pickupRec.bestOption.cardsTaken.length} kartu)
                 </span>
               </div>
               <div className="flex items-center gap-1 flex-wrap">
@@ -112,7 +118,8 @@ export function RecommendationPanel() {
               <div className="mt-1 space-y-0.5">
                 {pickupRec.bestOption.reasons.map((r, i) => (
                   <div key={i} className="flex items-start gap-1 text-blue-700">
-                    <span>&bull;</span><span>{r}</span>
+                    <span>&bull;</span>
+                    <span>{r}</span>
                   </div>
                 ))}
               </div>
@@ -148,8 +155,8 @@ export function RecommendationPanel() {
               <div className="text-sm font-medium text-foreground mb-2">Kombinasi Terkuat:</div>
               <div className="space-y-1">
                 {recommendation.strongestCombos.map((combo, i) => (
-                  <div key={i} className="flex items-center gap-1 flex-wrap">
-                    <span className="text-green-600 text-xs">&check;</span>
+                  <div key={i} className="flex items-center gap-2 flex-wrap">
+                    <Check className="text-green-600 size-4" />
                     {combo.cards.map((card) => (
                       <CardChip
                         key={`${card.suit}-${card.rank}`}
@@ -219,5 +226,5 @@ export function RecommendationPanel() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

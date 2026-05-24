@@ -1,0 +1,206 @@
+{
+  "/Users/tama/tamadev/ai-remi-assist/postcss.config.mjs": {
+    "mtime": 1779615842.2576878,
+    "hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/next-env.d.ts": {
+    "mtime": 1779631983.4300728,
+    "hash": "2a74d3909800ca5467fa83b0ab4a4890"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/vitest.config.ts": {
+    "mtime": 1779616011.4089906,
+    "hash": "0b88a06f12ac042870ae773486465c1d"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/eslint.config.mjs": {
+    "mtime": 1779615842.2573574,
+    "hash": "dfa1f5f6a7037bf39dc510f30b180002"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/next.config.ts": {
+    "mtime": 1779615842.2573447,
+    "hash": "9b77af189a21a7a64e4bd7a426f64176"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/types/index.ts": {
+    "mtime": 1779631300.5205863,
+    "hash": "f086055961545b3ad1677e2fa0783c08"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/app/layout.tsx": {
+    "mtime": 1779622735.442451,
+    "hash": "7a9b0e42446af84071e867ca0c740c16"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/app/page.tsx": {
+    "mtime": 1779623904.3005376,
+    "hash": "ad757278e962f63542e96c370f0aeefb"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/test/setup.ts": {
+    "mtime": 1779616016.7608106,
+    "hash": "68ba935884d6542fcf401db37bfb3880"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/recommendation/RecommendationPanel.tsx": {
+    "mtime": 1779632624.2747893,
+    "hash": "0a12304b5375b159c81b4ba472e6d85d"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/ui/card.tsx": {
+    "mtime": 1779626168.7748091,
+    "hash": "77a10bd948ca424972a28e704a3df604"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/ui/progress.tsx": {
+    "mtime": 1779626128.2553346,
+    "hash": "656a678d379ff2132dd1855b2359cc1c"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/ui/dialog.tsx": {
+    "mtime": 1779626060.5372748,
+    "hash": "e01132db6e9067b7b8cc2e322fdd34ff"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/ui/separator.tsx": {
+    "mtime": 1779626217.4009426,
+    "hash": "f57449eae78fbd87d99e4edc45ab3c1e"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/ui/button.tsx": {
+    "mtime": 1779622736.2760227,
+    "hash": "daafd007acc8e344a1c557ae9287fe14"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/hand/HandArea.tsx": {
+    "mtime": 1779626609.3933458,
+    "hash": "a2727f2b7845d010f7a38bd9949d3c2c"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/hand/CardChip.tsx": {
+    "mtime": 1779624054.0877514,
+    "hash": "8b1eb80adde8a9280da6b84137c79746"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/hand/CardPicker.tsx": {
+    "mtime": 1779627394.086163,
+    "hash": "c1897939c2ee27c121fe9353cbd779ae"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/melds/MeldTable.tsx": {
+    "mtime": 1779623761.8030806,
+    "hash": "6d3132084fdbf73334536be318d1f1cf"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/discard/DiscardPile.tsx": {
+    "mtime": 1779631718.4442234,
+    "hash": "5d931e51ec340a72308ffa1a210afc82"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/discard/DiscardPickupFlow.tsx": {
+    "mtime": 1779631839.6425395,
+    "hash": "cde8dce65450bd119fbcaa3f74e0b106"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/components/setup/GameSetup.tsx": {
+    "mtime": 1779627428.3058934,
+    "hash": "a055b751d8096b025665a762eac43383"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/lib/utils.ts": {
+    "mtime": 1779622736.3310885,
+    "hash": "5a6fd53fdcf2be529e9cc0b718fde352"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/recommendation/recommendationEngine.test.ts": {
+    "mtime": 1779631493.9731638,
+    "hash": "2eb6d73e809c0fad2ccdd8e8f5bf750e"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/recommendation/recommendationEngine.ts": {
+    "mtime": 1779631533.9459858,
+    "hash": "24a6c66612fb7cb55d436b229cfc34d4"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/heuristics/heuristicEvaluator.ts": {
+    "mtime": 1779617761.7764251,
+    "hash": "047d4ba6fd3dc953596cc0ff51f1fd50"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/heuristics/heuristicEvaluator.test.ts": {
+    "mtime": 1779617766.3856468,
+    "hash": "8f8731a00de744721ed296bb5006bd90"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/melds/meldDetector.ts": {
+    "mtime": 1779617018.9159675,
+    "hash": "8a286007b57b34d364b31d920d216ce8"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/melds/meldDetector.test.ts": {
+    "mtime": 1779617042.5528734,
+    "hash": "91ffe034f93ebf1a75dc59792055287a"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/probability/probabilityTracker.test.ts": {
+    "mtime": 1779631368.898006,
+    "hash": "868e4bcfe408dc08ea7aa6714413964d"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/probability/probabilityTracker.ts": {
+    "mtime": 1779631380.3398283,
+    "hash": "ae3a4255194bbcd8e0c4cff646d3ab7e"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/cards/cardUtils.test.ts": {
+    "mtime": 1779616369.4059017,
+    "hash": "691b2135cc9a9da222dee5898fc9992a"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/cards/cardUtils.ts": {
+    "mtime": 1779616356.7234178,
+    "hash": "7e63b9eb5911fe8403598286e1dd4dd4"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/solver/combinationSolver.test.ts": {
+    "mtime": 1779617126.9113228,
+    "hash": "4622cdce677cef5af419a7f73b9f81b2"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/engine/solver/combinationSolver.ts": {
+    "mtime": 1779617108.8854153,
+    "hash": "61cd66f7ae08db25272949b1f320cf7c"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/store/gameStore.ts": {
+    "mtime": 1779631646.8219852,
+    "hash": "8f0aff188b27fae35b2ce931d3be45e4"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/src/store/gameStore.test.ts": {
+    "mtime": 1779631624.7725744,
+    "hash": "369b9bb1c0e3e03f3a58690346f0212f"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/PRD.md": {
+    "mtime": 1779615879.326957,
+    "hash": "cd133aae23c58c52d612da4506fc62b4"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/README.md": {
+    "mtime": 1779615842.2576816,
+    "hash": "f15aaa42d5d299d091b1171097ea56ad"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/AGENTS.md": {
+    "mtime": 1779615865.9357848,
+    "hash": "9e09241799026ac05be315a2f0b50055"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/CLAUDE.md": {
+    "mtime": 1779615865.935926,
+    "hash": "5c27369b226fcf2be8a6cfe52224e767"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/docs/superpowers/plans/2026-05-24-discard-pickup.md": {
+    "mtime": 1779631214.2111275,
+    "hash": "4b391e9fe615e3f42251f8a884031ac0"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/docs/superpowers/plans/2026-05-24-remisense-ai-mvp.md": {
+    "mtime": 1779615879.3323624,
+    "hash": "2c52abe50e9ff8ee617daded9ec58217"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/docs/superpowers/specs/2026-05-24-shadcn-ui-improvement-design.md": {
+    "mtime": 1779619671.5182166,
+    "hash": "d79f875b4f59ce4d5cadbfbd1ce95150"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/docs/superpowers/specs/2026-05-24-remisense-ai-design.md": {
+    "mtime": 1779615879.3335488,
+    "hash": "ee17deb7fcb963238b042a982559e1eb"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/docs/superpowers/specs/2026-05-24-discard-pickup-design.md": {
+    "mtime": 1779629287.9723938,
+    "hash": "2d7eb08d9f1cdb1bfdbcc3fb81218ec6"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/public/file.svg": {
+    "mtime": 1779615842.2582386,
+    "hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/public/vercel.svg": {
+    "mtime": 1779615842.2584012,
+    "hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/public/next.svg": {
+    "mtime": 1779615842.2580497,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/public/globe.svg": {
+    "mtime": 1779615842.2579973,
+    "hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "/Users/tama/tamadev/ai-remi-assist/public/window.svg": {
+    "mtime": 1779615842.258114,
+    "hash": "a2760511c65806022ad20adf74370ff3"
+  }
+}
