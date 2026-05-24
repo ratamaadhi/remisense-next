@@ -97,4 +97,27 @@ describe("getCompletionProbability", () => {
     const prob = getCompletionProbability([], remaining)
     expect(prob).toBe(0)
   })
+
+  it("counts jokers in remaining as additional matches", () => {
+    const neededCards: Card[] = [{ suit: "spade", rank: 8 }]
+    const remaining: Card[] = [
+      { suit: "spade", rank: 8 },   // direct match
+      { suit: "heart", rank: 3 },   // joker (jokerRank=3)
+      { suit: "diamond", rank: 5 },
+      { suit: "club", rank: 10 },
+    ]
+    // 1 direct match + 1 joker = 2 matches out of 4
+    const prob = getCompletionProbability(neededCards, remaining, 3)
+    expect(prob).toBeCloseTo(2 / 4, 2)
+  })
+
+  it("returns same result when jokerRank is null (no jokers)", () => {
+    const neededCards: Card[] = [{ suit: "spade", rank: 7 }]
+    const remaining: Card[] = [
+      { suit: "spade", rank: 7 },
+      { suit: "heart", rank: 3 },
+    ]
+    const prob = getCompletionProbability(neededCards, remaining, null)
+    expect(prob).toBeCloseTo(1 / 2, 2)
+  })
 })
