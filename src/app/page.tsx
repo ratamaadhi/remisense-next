@@ -7,6 +7,7 @@ import { DiscardPile } from "@/components/discard/DiscardPile"
 import { MeldTable } from "@/components/melds/MeldTable"
 import { RecommendationPanel } from "@/components/recommendation/RecommendationPanel"
 import { formatCard } from "@/engine/cards/cardUtils"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   const { gamePhase, resetGame, jokerRank, jokerIndicator } = useGameStore()
@@ -15,7 +16,7 @@ export default function Home() {
     return (
       <main className="max-w-2xl mx-auto p-4 py-8">
         <h1 className="text-2xl font-bold text-center mb-2">RemiSense AI</h1>
-        <p className="text-center text-gray-500 text-sm mb-8">
+        <p className="text-center text-muted-foreground text-sm mb-8">
           AI Recommendation Assistant untuk permainan kartu Remi
         </p>
         <GameSetup />
@@ -27,19 +28,16 @@ export default function Home() {
     <main className="max-w-6xl mx-auto p-4 py-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">RemiSense AI</h1>
+          <h1 className="text-xl font-bold">RemiSense AI</h1>
           {jokerRank !== null && jokerIndicator && (
             <span className="text-xs text-purple-600">
               Joker: rank {jokerRank} ({formatCard(jokerIndicator)}) ★
             </span>
           )}
         </div>
-        <button
-          onClick={resetGame}
-          className="px-3 py-1.5 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors"
-        >
+        <Button variant="destructive" size="sm" onClick={resetGame}>
           Reset Permainan
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

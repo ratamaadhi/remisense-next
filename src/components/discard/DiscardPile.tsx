@@ -4,47 +4,58 @@ import { useState } from "react"
 import { useGameStore } from "@/store/gameStore"
 import { CardChip } from "@/components/hand/CardChip"
 import { CardPicker } from "@/components/hand/CardPicker"
-import type { Card } from "@/types"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import type { Card as CardType } from "@/types"
 
 export function DiscardPile() {
   const { discardPile, jokerRank, addToDiscardPile } = useGameStore()
   const [showPicker, setShowPicker] = useState(false)
 
   return (
-    <div className="border rounded-lg p-4 bg-white">
-      <div className="flex justify-between items-center mb-3">
-        <h2 className="text-base font-semibold text-gray-800">
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">
           Tumpukan Buangan ({discardPile.length})
-        </h2>
-      </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-wrap gap-1 min-h-[40px] items-center">
+          {discardPile.length === 0 && (
+            <span className="text-sm text-muted-foreground">Belum ada kartu buangan</span>
+          )}
+          {discardPile.map((card, i) => (
+            <span key={`${card.suit}-${card.rank}-${i}`} className="flex items-center">
+              <CardChip card={card} jokerRank={jokerRank} disabled />
+              {i < discardPile.length - 1 && (
+                <span className="mx-0.5 text-muted-foreground text-xs">&rarr;</span>
+              )}
+            </span>
+          ))}
+        </div>
 
-      <div className="flex flex-wrap gap-1 min-h-[40px] items-center">
-        {discardPile.length === 0 && (
-          <span className="text-sm text-gray-400">Belum ada kartu buangan</span>
-        )}
-        {discardPile.map((card, i) => (
-          <span key={`${card.suit}-${card.rank}-${i}`} className="flex items-center">
-            <CardChip card={card} jokerRank={jokerRank} disabled />
-            {i < discardPile.length - 1 && (
-              <span className="mx-0.5 text-gray-300 text-xs">→</span>
-            )}
-          </span>
-        ))}
-      </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-3"
+          onClick={() => setShowPicker(true)}
+        >
+          + Buangan Pemain Lain
+        </Button>
 
-      <button
-        onClick={() => setShowPicker(true)}
-        className="mt-3 px-3 py-1.5 text-sm border border-dashed border-gray-300 rounded hover:border-blue-400 hover:text-blue-600 transition-colors"
-      >
-        + Buangan Pemain Lain
-      </button>
-
-      {showPicker && (
-        <CardPicker
-          onSelect={(card: Card) => addToDiscardPile(card)}
-          onClose={() => setShowPicker(false)}
-        />
-      )}
-    </div>
+        <Dialog open={showPicker} onOpenChange={setShowPicker}>
+          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Pilih Kartu</DialogTitle>
+            </DialogHeader>
+            <CardPicker
+              onSelect={(card: CardType) => addToDiscardPile(card)}
+              onClose={() => setShowPicker(false)}
+            />
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
   )
 }

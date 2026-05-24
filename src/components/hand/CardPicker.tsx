@@ -4,6 +4,8 @@ import { useState } from "react"
 import type { Card, Suit } from "@/types"
 import { formatCard, cardEquals } from "@/engine/cards/cardUtils"
 import { useGameStore } from "@/store/gameStore"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 type CardPickerProps = {
   onSelect: (card: Card) => void
@@ -14,10 +16,10 @@ type CardPickerProps = {
 
 const SUIT_ORDER: Suit[] = ["spade", "heart", "diamond", "club"]
 const SUIT_LABELS: Record<Suit, string> = {
-  spade: "♠ Sekop",
-  heart: "♥ Hati",
-  diamond: "♦ Wajik",
-  club: "♣ Keriting",
+  spade: "\u2660 Sekop",
+  heart: "\u2665 Hati",
+  diamond: "\u2666 Wajik",
+  club: "\u2663 Keriting",
 }
 
 const RANK_LABELS: Record<number, string> = {
@@ -31,7 +33,6 @@ export function CardPicker({ onSelect, onClose, multiSelect = false, onMultiSele
   const { hand, discardPile, visibleMelds, jokerIndicator } = useGameStore()
   const [selected, setSelected] = useState<Card[]>([])
 
-  // All cards already used in any zone
   const usedCards: Card[] = [
     ...hand,
     ...discardPile,
@@ -70,78 +71,63 @@ export function CardPicker({ onSelect, onClose, multiSelect = false, onMultiSele
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">
-            {multiSelect ? "Pilih Kartu (min. 3)" : "Pilih Kartu"}
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-xl leading-none"
-            aria-label="Tutup"
-          >
-            ✕
-          </button>
-        </div>
-
-        {SUIT_ORDER.map((suit) => {
-          const isRed = suit === "heart" || suit === "diamond"
-          return (
-            <div key={suit} className="mb-3">
-              <div className={`text-sm font-medium mb-1 ${isRed ? "text-red-600" : "text-gray-800"}`}>
-                {SUIT_LABELS[suit]}
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {Array.from({ length: 13 }, (_, i) => i + 1).map((rank) => {
-                  const card: Card = { suit, rank }
-                  const used = isUsed(card)
-                  const sel = isSelected(card)
-                  const label = RANK_LABELS[rank] ?? String(rank)
-
-                  return (
-                    <button
-                      key={rank}
-                      type="button"
-                      onClick={() => handleCardClick(card)}
-                      disabled={used}
-                      aria-label={formatCard(card)}
-                      className={[
-                        "w-8 h-10 text-xs font-mono font-bold rounded border transition-all",
-                        used
-                          ? "opacity-30 cursor-not-allowed bg-gray-100 border-gray-200 text-gray-400"
-                          : sel
-                            ? "bg-blue-100 border-blue-400 ring-2 ring-blue-300 " + (isRed ? "text-red-600" : "text-gray-900")
-                            : isRed
-                              ? "text-red-600 border-red-200 hover:bg-red-50 bg-white"
-                              : "text-gray-900 border-gray-300 hover:bg-gray-50 bg-white",
-                      ].join(" ")}
-                    >
-                      {label}
-                    </button>
-                  )
-                })}
-              </div>
+    <div>
+      {SUIT_ORDER.map((suit) => {
+        const isRed = suit === "heart" || suit === "diamond"
+        return (
+          <div key={suit} className="mb-3">
+            <div className={cn("text-sm font-medium mb-1", isRed ? "text-red-600" : "text-foreground")}>
+              {SUIT_LABELS[suit]}
             </div>
-          )
-        })}
+            <div className="flex flex-wrap gap-1">
+              {Array.from({ length: 13 }, (_, i) => i + 1).map((rank) => {
+                const card: Card = { suit, rank }
+                const used = isUsed(card)
+                const sel = isSelected(card)
+                const label = RANK_LABELS[rank] ?? String(rank)
 
-        {multiSelect && (
-          <div className="mt-4 flex justify-between items-center border-t pt-3">
-            <span className="text-sm text-gray-600">
-              {selected.length} kartu dipilih
-              {selected.length < 3 && " (min. 3)"}
-            </span>
-            <button
-              onClick={handleConfirmMulti}
-              disabled={selected.length < 3}
-              className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 text-sm font-medium"
-            >
-              Konfirmasi
-            </button>
+                return (
+                  <button
+                    key={rank}
+                    type="button"
+                    onClick={() => handleCardClick(card)}
+                    disabled={used}
+                    aria-label={formatCard(card)}
+                    className={cn(
+                      "w-8 h-10 text-xs font-mono font-bold rounded-md border transition-all",
+                      used
+                        ? "opacity-30 cursor-not-allowed bg-muted border-border text-muted-foreground"
+                        : sel
+                          ? cn("bg-blue-100 border-blue-400 ring-2 ring-blue-300", isRed ? "text-red-600" : "text-foreground")
+                          : isRed
+                            ? "text-red-600 border-red-200 hover:bg-red-50 bg-white"
+                            : "text-foreground border-border hover:bg-muted bg-white"
+                    )}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
           </div>
-        )}
-      </div>
+        )
+      })}
+
+      {multiSelect && (
+        <div className="mt-4 flex justify-between items-center border-t pt-3">
+          <span className="text-sm text-muted-foreground">
+            {selected.length} kartu dipilih
+            {selected.length < 3 && " (min. 3)"}
+          </span>
+          <Button
+            onClick={handleConfirmMulti}
+            disabled={selected.length < 3}
+          >
+            Konfirmasi
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
+
