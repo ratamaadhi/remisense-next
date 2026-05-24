@@ -1,6 +1,6 @@
 import type { Card, Suit } from "@/types"
 
-export const SUITS: Suit[] = ["spade", "heart", "diamond", "club"]
+export const SUITS: readonly Suit[] = ["spade", "heart", "diamond", "club"]
 
 const SUIT_SYMBOLS: Record<Suit, string> = {
   spade: "♠",
@@ -30,7 +30,7 @@ const RANK_CODES: Record<string, number> = {
   K: 13,
 }
 
-export const ALL_CARDS: Card[] = SUITS.flatMap((suit) =>
+export const ALL_CARDS: readonly Card[] = SUITS.flatMap((suit) =>
   Array.from({ length: 13 }, (_, i) => ({ suit, rank: i + 1 }))
 )
 
@@ -39,6 +39,9 @@ export function parseCard(notation: string): Card {
   const rankStr = notation.slice(0, -1)
   const suit = SUIT_CODES[suitCode]
   const rank = RANK_CODES[rankStr] ?? parseInt(rankStr, 10)
+  if (!suit || !rank || isNaN(rank)) {
+    throw new Error(`Invalid card notation: "${notation}"`)
+  }
   return { suit, rank }
 }
 
@@ -51,11 +54,22 @@ export function cardEquals(a: Card, b: Card): boolean {
   return a.suit === b.suit && a.rank === b.rank
 }
 
+/**
+ * Returns the point value of a card for penalty scoring.
+ * Face cards (J/Q/K) = 10 points. Number cards = face value.
+ * Ace = 1 point (low value in this implementation).
+ */
 export function getRankValue(card: Card): number {
   if (card.rank >= 11) return 10
   return card.rank
 }
 
+/**
+ * Returns true if the card is a joker (wildcard).
+ * In this Remi variant, ALL cards sharing the same rank as jokerRank
+ * are treated as jokers — not just the specific drawn card.
+ * Example: if jokerRank=7, then 7♠ 7♥ 7♦ 7♣ are all jokers.
+ */
 export function isJoker(card: Card, jokerRank: number | null): boolean {
   if (jokerRank === null) return false
   return card.rank === jokerRank

@@ -14,6 +14,10 @@ describe("parseCard", () => {
   it("parses 10C to club rank 10", () => {
     expect(parseCard("10C")).toEqual({ suit: "club", rank: 10 })
   })
+  it("throws on invalid notation", () => {
+    expect(() => parseCard("7X")).toThrow("Invalid card notation")
+    expect(() => parseCard("??S")).toThrow("Invalid card notation")
+  })
 })
 
 describe("formatCard", () => {
@@ -25,6 +29,9 @@ describe("formatCard", () => {
   })
   it("formats diamond A to A♦", () => {
     expect(formatCard({ suit: "diamond", rank: 1 })).toBe("A♦")
+  })
+  it("formats club 10 to 10♣", () => {
+    expect(formatCard({ suit: "club", rank: 10 })).toBe("10♣")
   })
 })
 
@@ -43,6 +50,9 @@ describe("cardEquals", () => {
 describe("getRankValue", () => {
   it("returns rank value for number cards", () => {
     expect(getRankValue({ suit: "spade", rank: 7 })).toBe(7)
+  })
+  it("returns 10 for rank 10", () => {
+    expect(getRankValue({ suit: "spade", rank: 10 })).toBe(10)
   })
   it("returns 10 for J", () => {
     expect(getRankValue({ suit: "spade", rank: 11 })).toBe(10)
