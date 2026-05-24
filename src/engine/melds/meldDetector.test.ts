@@ -141,3 +141,22 @@ describe("isJoker", () => {
     expect(isJoker({ suit: "spade", rank: 7 }, null)).toBe(false)
   })
 })
+
+describe("edge cases", () => {
+  it("returns empty for empty hand", () => {
+    expect(detectSets([], null)).toHaveLength(0)
+    expect(detectSequences([], null)).toHaveLength(0)
+    expect(detectNearMelds([], null)).toHaveLength(0)
+  })
+
+  it("returns empty sets and sequences for all-joker hand", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 7 },
+      { suit: "heart", rank: 7 },
+      { suit: "diamond", rank: 7 },
+    ]
+    // All cards are jokers — no non-joker cards to form melds
+    expect(detectSets(hand, 7)).toHaveLength(0)
+    expect(detectSequences(hand, 7)).toHaveLength(0)
+  })
+})

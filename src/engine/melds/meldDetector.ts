@@ -1,8 +1,13 @@
 import type { Card, Meld, NearMeld } from "@/types"
-import { isJoker } from "@/engine/cards/cardUtils"
+import { isJoker, cardEquals } from "@/engine/cards/cardUtils"
 
 export { isJoker }
 
+/**
+ * Detects all possible sets in the hand.
+ * NOTE: Returned melds may share joker cards. The combination solver
+ * handles conflict resolution.
+ */
 export function detectSets(hand: Card[], jokerRank: number | null): Meld[] {
   const melds: Meld[] = []
   const nonJokers = hand.filter((c) => !isJoker(c, jokerRank))
@@ -26,6 +31,12 @@ export function detectSets(hand: Card[], jokerRank: number | null): Meld[] {
   return melds
 }
 
+/**
+ * Detects all possible sequences in the hand.
+ * NOTE: Returned melds may share joker cards when multiple sequences
+ * are possible. The combination solver is responsible for allocating
+ * jokers to non-overlapping melds.
+ */
 export function detectSequences(hand: Card[], jokerRank: number | null): Meld[] {
   const melds: Meld[] = []
   const nonJokers = hand.filter((c) => !isJoker(c, jokerRank))
@@ -79,6 +90,7 @@ export function detectSequences(hand: Card[], jokerRank: number | null): Meld[] 
 export function detectNearMelds(hand: Card[], jokerRank: number | null): NearMeld[] {
   const nearMelds: NearMeld[] = []
   const nonJokers = hand.filter((c) => !isJoker(c, jokerRank))
+  const jokers = hand.filter((c) => isJoker(c, jokerRank))
 
   // Near-sets: 2 cards with same rank
   const byRank = new Map<number, Card[]>()
@@ -138,6 +150,33 @@ export function detectNearMelds(hand: Card[], jokerRank: number | null): NearMel
           cards: [sorted[i], sorted[i + 1]],
           type: "near-sequence",
           neededCards,
+          completionProbability: 0,
+        })
+      }
+    }
+  }
+
+  // Joker-assisted near-melds: joker + 1 non-joker card = near-meld
+  if (jokers.length > 0) {
+    for (const card of nonJokers) {
+      // joker + any card = near-set (needs 1 more of same rank)
+      const usedSuits = [card.suit]
+      const neededForSet: Card[] = (["spade", "heart", "diamond", "club"] as const)
+        .filter((s) => !usedSuits.includes(s))
+        .map((s) => ({ suit: s, rank: card.rank }))
+
+      // Only add if not already covered by existing near-set
+      const alreadyCovered = nearMelds.some(
+        (nm) => nm.type === "near-set" && nm.cards.some((c) => cardEquals(c, card))
+      )
+      if (!alreadyCovered) {
+        nearMelds.push({
+          cards: [card, jokers[0]],
+          type: "near-set",
+          neededCards: neededForSet.slice(0, 1), // need 1 more
+          // completionProbability is intentionally 0 here.
+          // It will be calculated by probabilityTracker.getCompletionProbability()
+          // when the recommendation engine builds the full GameContext.
           completionProbability: 0,
         })
       }
