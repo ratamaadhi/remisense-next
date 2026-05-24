@@ -27,6 +27,8 @@ type GameState = {
   addToDiscardPile: (card: Card) => void
   addMeldGroup: (cards: Card[]) => void
   removeMeldGroup: (index: number) => void
+  pickupFromDiscard: (cardsTaken: Card[], formedMeld: Card[], discardAfter: Card) => void
+  opponentPickupFromDiscard: (cardsTaken: Card[], formedMeld: Card[], newDiscard: Card) => void
   setRecommendation: (rec: Recommendation | null) => void
   resetGame: () => void
 }
@@ -101,9 +103,42 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   removeMeldGroup: (index) => {
     const state = get()
-    // Cards from removed melds are freed from all zones.
-    // They can be re-added to hand or discard via addToHand/addToDiscardPile.
     set({ visibleMelds: state.visibleMelds.filter((_, i) => i !== index) })
+  },
+
+  pickupFromDiscard: (cardsTaken, formedMeld, discardAfter) => {
+    const state = get()
+    // 1. Remove cardsTaken from discardPile
+    const newDiscardPile = state.discardPile.filter(
+      (c) => !cardsTaken.some((t) => cardEquals(t, c))
+    )
+    // 2. Add cardsTaken to hand
+    let newHand = [...state.hand, ...cardsTaken]
+    // 3. Remove formedMeld cards from hand
+    newHand = newHand.filter(
+      (c) => !formedMeld.some((m) => cardEquals(m, c))
+    )
+    // 4. Remove discardAfter from hand
+    newHand = newHand.filter((c) => !cardEquals(c, discardAfter))
+
+    set({
+      hand: newHand,
+      discardPile: [...newDiscardPile, discardAfter],
+      visibleMelds: [...state.visibleMelds, formedMeld],
+    })
+  },
+
+  opponentPickupFromDiscard: (cardsTaken, formedMeld, newDiscard) => {
+    const state = get()
+    // 1. Remove cardsTaken from discardPile
+    const newDiscardPile = state.discardPile.filter(
+      (c) => !cardsTaken.some((t) => cardEquals(t, c))
+    )
+
+    set({
+      discardPile: [...newDiscardPile, newDiscard],
+      visibleMelds: [...state.visibleMelds, formedMeld],
+    })
   },
 
   setRecommendation: (rec) => set({ recommendation: rec }),

@@ -128,6 +128,144 @@ describe("gameStore", () => {
     })
   })
 
+  describe("pickupFromDiscard", () => {
+    beforeEach(() => {
+      useGameStore.setState({
+        hand: [],
+        discardPile: [],
+        visibleMelds: [],
+        jokerRank: null,
+        jokerIndicator: null,
+        gamePhase: "playing",
+        playerCount: 4,
+        recommendation: null,
+      })
+    })
+
+    it("moves cards correctly across all zones", () => {
+      useGameStore.setState({
+        hand: [
+          { suit: "spade", rank: 2 },
+          { suit: "spade", rank: 3 },
+          { suit: "diamond", rank: 9 },
+        ],
+        discardPile: [
+          { suit: "heart", rank: 5 },
+          { suit: "spade", rank: 4 },
+        ],
+      })
+
+      useGameStore.getState().pickupFromDiscard(
+        [{ suit: "spade", rank: 4 }],
+        [{ suit: "spade", rank: 2 }, { suit: "spade", rank: 3 }, { suit: "spade", rank: 4 }],
+        { suit: "diamond", rank: 9 }
+      )
+
+      const state = useGameStore.getState()
+      expect(state.hand).toEqual([])
+      expect(state.visibleMelds).toEqual([
+        [{ suit: "spade", rank: 2 }, { suit: "spade", rank: 3 }, { suit: "spade", rank: 4 }],
+      ])
+      expect(state.discardPile).toEqual([
+        { suit: "heart", rank: 5 },
+        { suit: "diamond", rank: 9 },
+      ])
+    })
+
+    it("does not leave duplicate cards in any zone", () => {
+      useGameStore.setState({
+        hand: [
+          { suit: "heart", rank: 7 },
+          { suit: "diamond", rank: 7 },
+          { suit: "club", rank: 12 },
+          { suit: "spade", rank: 1 },
+        ],
+        discardPile: [
+          { suit: "spade", rank: 10 },
+          { suit: "club", rank: 7 },
+        ],
+      })
+
+      useGameStore.getState().pickupFromDiscard(
+        [{ suit: "club", rank: 7 }],
+        [{ suit: "heart", rank: 7 }, { suit: "diamond", rank: 7 }, { suit: "club", rank: 7 }],
+        { suit: "club", rank: 12 }
+      )
+
+      const state = useGameStore.getState()
+      const allCards = [
+        ...state.hand,
+        ...state.discardPile,
+        ...state.visibleMelds.flat(),
+      ]
+      const uniqueKeys = new Set(allCards.map((c) => `${c.suit}-${c.rank}`))
+      expect(uniqueKeys.size).toBe(allCards.length)
+    })
+  })
+
+  describe("opponentPickupFromDiscard", () => {
+    beforeEach(() => {
+      useGameStore.setState({
+        hand: [],
+        discardPile: [],
+        visibleMelds: [],
+        jokerRank: null,
+        jokerIndicator: null,
+        gamePhase: "playing",
+        playerCount: 4,
+        recommendation: null,
+      })
+    })
+
+    it("updates discardPile and visibleMelds correctly", () => {
+      useGameStore.setState({
+        discardPile: [
+          { suit: "heart", rank: 1 },
+          { suit: "diamond", rank: 5 },
+          { suit: "club", rank: 8 },
+        ],
+      })
+
+      useGameStore.getState().opponentPickupFromDiscard(
+        [{ suit: "diamond", rank: 5 }, { suit: "club", rank: 8 }],
+        [{ suit: "club", rank: 6 }, { suit: "club", rank: 7 }, { suit: "club", rank: 8 }],
+        { suit: "spade", rank: 11 }
+      )
+
+      const state = useGameStore.getState()
+      expect(state.discardPile).toEqual([
+        { suit: "heart", rank: 1 },
+        { suit: "spade", rank: 11 },
+      ])
+      expect(state.visibleMelds).toEqual([
+        [{ suit: "club", rank: 6 }, { suit: "club", rank: 7 }, { suit: "club", rank: 8 }],
+      ])
+    })
+
+    it("does not leave duplicate cards", () => {
+      useGameStore.setState({
+        discardPile: [
+          { suit: "spade", rank: 3 },
+          { suit: "heart", rank: 9 },
+        ],
+      })
+
+      useGameStore.getState().opponentPickupFromDiscard(
+        [{ suit: "heart", rank: 9 }],
+        [{ suit: "heart", rank: 9 }, { suit: "heart", rank: 10 }, { suit: "heart", rank: 11 }],
+        { suit: "diamond", rank: 2 }
+      )
+
+      const state = useGameStore.getState()
+      const allCards = [
+        ...state.discardPile,
+        ...state.visibleMelds.flat(),
+      ]
+      const uniqueKeys = new Set(allCards.map((c) => `${c.suit}-${c.rank}`))
+      expect(uniqueKeys.size).toBe(allCards.length)
+    })
+  })
+
   describe("resetGame", () => {
     it("resets all state to initial values", () => {
       useGameStore.getState().addToHand({ suit: "spade", rank: 7 })
