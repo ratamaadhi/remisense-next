@@ -21,9 +21,9 @@ describe("scoreCard", () => {
   it("gives high score to card in a completed set", () => {
     const card: Card = { suit: "spade", rank: 7 }
     const score = scoreCard(card, baseContext)
-    // Card is in a completed set — should score above an isolated card (0)
-    // comboPotential=1/3, flexibility=1/4, deadRisk=0, highPointPenalty=0.7 → ~11
-    expect(score).toBeGreaterThan(5)
+    // Card is in a completed set — should score well above an isolated card
+    // comboPotential=1.0, flexibility=1/4, deadRisk=0, highPointPenalty≈0.054 → ~44.5
+    expect(score).toBeGreaterThan(30)
   })
 
   it("gives low score to isolated high card", () => {

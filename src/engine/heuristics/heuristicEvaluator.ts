@@ -39,11 +39,12 @@ export function scoreCard(card: Card, context: GameContext): number {
     completionProbability: getCompletionProbability(nm.neededCards, remaining, jokerRank),
   }))
 
-  // comboPotential: how many completed melds this card participates in, normalized by cap of 3
+  // comboPotential: binary — 1.0 if card is in any completed meld, 0 otherwise
+  // A card is either in a meld or it isn't; fractional normalization under-rewards meld membership
   const meldsWithCard = allMelds.filter((m) =>
     m.cards.some((c) => cardEquals(c, card))
   )
-  const comboPotential = Math.min(meldsWithCard.length / 3, 1.0)
+  const comboPotential = meldsWithCard.length > 0 ? 1.0 : 0
 
   // completionChance: average completionProbability of near-melds involving this card (0-1)
   const nearMeldsWithCard = nearMelds.filter((nm) =>
@@ -63,10 +64,10 @@ export function scoreCard(card: Card, context: GameContext): number {
   const isInNearMeld = nearMeldsWithCard.length > 0
   const deadRisk = isInMeld ? 0 : isInNearMeld ? 0.3 : 1.0
 
-  // highPointPenalty: based on actual game point value via getRankValue, normalized to [0, 1]
-  // getRankValue returns 1-10 for number cards, 10 for face cards
+  // highPointPenalty: only penalize high-value cards (rank >= 10)
+  // Low cards (rank < 10) have minimal penalty to avoid over-penalizing useful cards
   const pointValue = getRankValue(card)
-  const highPointPenalty = pointValue / 10
+  const highPointPenalty = card.rank >= 10 ? pointValue / 10 : card.rank / 130
 
   const score =
     (comboPotential * 40) +
