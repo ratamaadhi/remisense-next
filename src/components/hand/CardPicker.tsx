@@ -12,6 +12,7 @@ type CardPickerProps = {
   onClose: () => void
   multiSelect?: boolean
   onMultiSelect?: (cards: Card[]) => void
+  autoClose?: boolean
 }
 
 const SUIT_ORDER: Suit[] = ["spade", "heart", "diamond", "club"]
@@ -29,7 +30,7 @@ const RANK_LABELS: Record<number, string> = {
   13: "K",
 }
 
-export function CardPicker({ onSelect, onClose, multiSelect = false, onMultiSelect }: CardPickerProps) {
+export function CardPicker({ onSelect, onClose, multiSelect = false, onMultiSelect, autoClose = true }: CardPickerProps) {
   const { hand, discardPile, visibleMelds, jokerIndicator } = useGameStore()
   const [selected, setSelected] = useState<Card[]>([])
 
@@ -59,7 +60,9 @@ export function CardPicker({ onSelect, onClose, multiSelect = false, onMultiSele
       }
     } else {
       onSelect(card)
-      onClose()
+      if (autoClose) {
+        onClose()
+      }
     }
   }
 

@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useGameStore } from "@/store/gameStore"
-import { CardPicker } from "@/components/hand/CardPicker"
-import { CardChip } from "@/components/hand/CardChip"
-import { formatCard } from "@/engine/cards/cardUtils"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import type { Card as CardType } from "@/types"
+import { useState } from "react";
+import { useGameStore } from "@/store/gameStore";
+import { CardPicker } from "@/components/hand/CardPicker";
+import { CardChip } from "@/components/hand/CardChip";
+import { formatCard } from "@/engine/cards/cardUtils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import type { Card as CardType } from "@/types";
 
-type SetupStep = "playerCount" | "hand" | "initialDiscard" | "joker" | "done"
+type SetupStep = "playerCount" | "hand" | "initialDiscard" | "joker" | "done";
 
 const STEP_MAP: Record<SetupStep, number> = {
   playerCount: 1,
@@ -19,7 +25,7 @@ const STEP_MAP: Record<SetupStep, number> = {
   initialDiscard: 3,
   joker: 4,
   done: 5,
-}
+};
 
 export function GameSetup() {
   const {
@@ -34,25 +40,34 @@ export function GameSetup() {
     addInitialDiscard,
     setJokerIndicator,
     startGame,
-  } = useGameStore()
+  } = useGameStore();
 
-  const [step, setStep] = useState<SetupStep>("playerCount")
-  const [showPicker, setShowPicker] = useState(false)
-  const [pickerTarget, setPickerTarget] = useState<"hand" | "discard" | "joker">("hand")
+  const [step, setStep] = useState<SetupStep>("playerCount");
+  const [showPicker, setShowPicker] = useState(false);
+  const [pickerTarget, setPickerTarget] = useState<"hand" | "discard" | "joker">("hand");
 
   function openPicker(target: "hand" | "discard" | "joker") {
-    setPickerTarget(target)
-    setShowPicker(true)
+    setPickerTarget(target);
+    setShowPicker(true);
   }
 
   function handlePickerSelect(card: CardType) {
     if (pickerTarget === "hand") {
       addToHand(card)
+      // Auto-close when 7 cards reached (hand.length is pre-update, so check for 6)
+      if (hand.length >= 6) {
+        setShowPicker(false)
+      }
     } else if (pickerTarget === "discard") {
       addInitialDiscard(card)
+      // Auto-close when playerCount reached
+      if (discardPile.length >= playerCount - 1) {
+        setShowPicker(false)
+      }
     } else if (pickerTarget === "joker") {
       setJokerIndicator(card)
       setStep("done")
+      setShowPicker(false)
     }
   }
 
@@ -61,9 +76,7 @@ export function GameSetup() {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">Setup Permainan</CardTitle>
         <Progress value={(STEP_MAP[step] / 5) * 100} className="mt-3" />
-        <p className="text-xs text-muted-foreground mt-2">
-          Langkah {STEP_MAP[step]} dari 5
-        </p>
+        <p className="text-xs text-muted-foreground mt-2">Langkah {STEP_MAP[step]} dari 5</p>
       </CardHeader>
       <CardContent>
         {/* Step 1: Player Count */}
@@ -76,7 +89,10 @@ export function GameSetup() {
                   key={n}
                   variant="outline"
                   className="w-10 h-10"
-                  onClick={() => { setPlayerCount(n); setStep("hand") }}
+                  onClick={() => {
+                    setPlayerCount(n);
+                    setStep("hand");
+                  }}
                 >
                   {n}
                 </Button>
@@ -161,11 +177,7 @@ export function GameSetup() {
                 </span>
               </div>
             ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPicker("joker")}
-              >
+              <Button variant="outline" size="sm" onClick={() => openPicker("joker")}>
                 + Pilih Kartu Penentu Joker
               </Button>
             )}
@@ -199,10 +211,11 @@ export function GameSetup() {
             <CardPicker
               onSelect={handlePickerSelect}
               onClose={() => setShowPicker(false)}
+              autoClose={pickerTarget === "joker"}
             />
           </DialogContent>
         </Dialog>
       </CardContent>
     </Card>
-  )
+  );
 }
