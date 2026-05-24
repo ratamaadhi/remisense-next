@@ -72,8 +72,9 @@ describe("detectSequences", () => {
       { suit: "heart", rank: 6 },
     ]
     const seqs = detectSequences(hand, null)
+    // Sub-sequence enumeration: [3,4,5], [4,5,6], [3,4,5,6] — at least one with length >= 4
     expect(seqs.length).toBeGreaterThanOrEqual(1)
-    expect(seqs[0].cards.length).toBeGreaterThanOrEqual(4)
+    expect(seqs.some((s) => s.cards.length >= 4)).toBe(true)
   })
 
   it("returns empty when no sequences exist", () => {

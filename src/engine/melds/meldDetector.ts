@@ -49,26 +49,25 @@ export function detectSequences(hand: Card[], jokerRank: number | null): Meld[] 
     bySuit.set(card.suit, group)
   }
 
-  for (const [, cards] of bySuit) {
+  for (const [suit, cards] of bySuit) {
     const sorted = [...cards].sort((a, b) => a.rank - b.rank)
-    const jokersAvailable = jokers.length
 
+    // Build maximal runs (consecutive cards, with joker gap-fill)
     let i = 0
     while (i < sorted.length) {
-      const sequence: Card[] = [sorted[i]]
+      const run: Card[] = [sorted[i]]
       let currentRank = sorted[i].rank
       let j = i + 1
       let usedJokers = 0
 
       while (j < sorted.length) {
         const nextCard = sorted[j]
-
         if (nextCard.rank === currentRank + 1) {
-          sequence.push(nextCard)
+          run.push(nextCard)
           currentRank = nextCard.rank
           j++
-        } else if (nextCard.rank === currentRank + 2 && jokersAvailable - usedJokers > 0) {
-          sequence.push(jokers[usedJokers])
+        } else if (nextCard.rank === currentRank + 2 && jokers.length - usedJokers > 0) {
+          run.push(jokers[usedJokers])
           usedJokers++
           currentRank = currentRank + 1
           // don't advance j — re-check nextCard at new currentRank
@@ -77,9 +76,13 @@ export function detectSequences(hand: Card[], jokerRank: number | null): Meld[] 
         }
       }
 
-      if (sequence.length >= 3) {
-        melds.push({ cards: [...sequence], type: "sequence" })
+      // Enumerate all sub-sequences of length >= 3 from this run
+      for (let start = 0; start <= run.length - 3; start++) {
+        for (let end = start + 3; end <= run.length; end++) {
+          melds.push({ cards: run.slice(start, end), type: "sequence" })
+        }
       }
+
       i = j > i + 1 ? j : i + 1
     }
   }

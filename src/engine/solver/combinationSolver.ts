@@ -23,6 +23,13 @@ export function solveOptimalMelds(hand: Card[], jokerRank: number | null): MeldA
 
   function backtrack(index: number, usedCards: Card[], currentMelds: Meld[]) {
     const currentCardCount = usedCards.length
+
+    // Branch-and-bound: prune if remaining melds can't beat current best
+    const remainingPotential = allMelds
+      .slice(index)
+      .reduce((sum, m) => sum + m.cards.length, 0)
+    if (currentCardCount + remainingPotential <= bestCardCount) return
+
     if (currentCardCount > bestCardCount) {
       bestCardCount = currentCardCount
       bestAllocation = [...currentMelds]
@@ -52,13 +59,14 @@ export function solveOptimalMelds(hand: Card[], jokerRank: number | null): MeldA
   )
 
   // Cards that appeared in any detected meld candidate (but weren't allocated)
-  // are considered "contested" — they had a complete meld but lost conflict resolution.
-  // Exclude them from near-meld detection so they land in deadCards instead.
-  const allocatedMeldCards = new Set(bestAllocation.flatMap((m) => m.cards))
+  // are considered "contested" only if the entire meld was available but lost
+  // conflict resolution (i.e., none of its cards were taken by the winning allocation).
+  // If some cards in the unallocated meld were taken, the meld was broken by conflict —
+  // the remaining cards are free for near-meld detection.
   const contestedCards = allMelds
     .filter((m) => !bestAllocation.includes(m))
+    .filter((m) => m.cards.every((card) => !usedInMelds.some((used) => cardEquals(card, used))))
     .flatMap((m) => m.cards)
-    .filter((card) => !allocatedMeldCards.has(card))
 
   const cardsForNearMelds = remainingCards.filter(
     (card) => !contestedCards.some((c) => cardEquals(c, card))

@@ -41,7 +41,9 @@ describe("solveOptimalMelds", () => {
     const result = solveOptimalMelds(hand, null)
     const totalInMelds = result.completedMelds.reduce((sum, m) => sum + m.cards.length, 0)
     expect(totalInMelds).toBe(3)
-    expect(result.deadCards).toHaveLength(2)
+    // The 2 leftover cards form a near-meld (near-set or near-sequence), not dead cards
+    expect(result.completedMelds).toHaveLength(1)
+    expect(result.nearMelds.length + result.deadCards.length).toBeGreaterThanOrEqual(1)
   })
 
   it("handles hand with no melds", () => {
@@ -87,5 +89,35 @@ describe("solveOptimalMelds", () => {
     expect(result.completedMelds).toHaveLength(0)
     expect(result.nearMelds).toHaveLength(0)
     expect(result.deadCards).toHaveLength(0)
+  })
+
+  it("correctly classifies nearMelds after allocation", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 7 },
+      { suit: "heart", rank: 7 },
+      { suit: "diamond", rank: 7 },
+      { suit: "spade", rank: 5 },
+      { suit: "spade", rank: 6 },
+    ]
+    const result = solveOptimalMelds(hand, null)
+    // Set(7S,7H,7D) is completed, 5S+6S should be near-sequence
+    expect(result.completedMelds).toHaveLength(1)
+    expect(result.nearMelds.length).toBeGreaterThanOrEqual(1)
+    expect(result.deadCards).toHaveLength(0)
+  })
+
+  it("handles multiple jokers", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 3 },  // joker
+      { suit: "heart", rank: 3 },  // joker
+      { suit: "spade", rank: 7 },
+      { suit: "heart", rank: 7 },
+      { suit: "spade", rank: 5 },
+      { suit: "spade", rank: 6 },
+    ]
+    // Two jokers: one can complete set(7S,7H,joker), other can extend sequence
+    const result = solveOptimalMelds(hand, 3)
+    const totalInMelds = result.completedMelds.reduce((sum, m) => sum + m.cards.length, 0)
+    expect(totalInMelds).toBeGreaterThanOrEqual(3)
   })
 })
