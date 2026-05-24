@@ -13,11 +13,34 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cardEquals } from "@/engine/cards/cardUtils";
 import type { Card as CardType } from "@/types";
 
 export function HandArea() {
-  const { hand, jokerRank, addToHand, removeFromHand } = useGameStore();
+  const { hand, jokerRank, addToHand, removeFromHand, layDownMeld } = useGameStore();
   const [showPicker, setShowPicker] = useState(false);
+  const [showLayDown, setShowLayDown] = useState(false);
+  const [selectedMeld, setSelectedMeld] = useState<CardType[]>([]);
+
+  function toggleMeldCard(card: CardType) {
+    setSelectedMeld((prev) =>
+      prev.some((c) => cardEquals(c, card))
+        ? prev.filter((c) => !cardEquals(c, card))
+        : [...prev, card]
+    )
+  }
+
+  function handleLayDownConfirm() {
+    if (selectedMeld.length < 3) return
+    layDownMeld(selectedMeld)
+    setSelectedMeld([])
+    setShowLayDown(false)
+  }
+
+  function handleLayDownClose() {
+    setSelectedMeld([])
+    setShowLayDown(false)
+  }
 
   return (
     <Card>
@@ -39,20 +62,77 @@ export function HandArea() {
           ))}
         </div>
 
-        <Button variant="outline" size="sm" className="mt-3" onClick={() => setShowPicker(true)}>
-          + Tambah Kartu
-        </Button>
+        <div className="flex flex-wrap gap-2 mt-3">
+          <Button variant="outline" size="sm" onClick={() => setShowPicker(true)}>
+            + Tambah Kartu
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowLayDown(true)}
+            disabled={hand.length < 3}
+          >
+            Turun Meld
+          </Button>
+        </div>
 
+        {/* Add card dialog */}
         <Dialog open={showPicker} onOpenChange={setShowPicker}>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Pilih Kartu</DialogTitle>
-              <DialogDescription>at least 3 cards</DialogDescription>
+              <DialogDescription>Pilih kartu untuk ditambahkan ke tangan</DialogDescription>
             </DialogHeader>
             <CardPicker
               onSelect={(card: CardType) => addToHand(card)}
               onClose={() => setShowPicker(false)}
             />
+          </DialogContent>
+        </Dialog>
+
+        {/* Lay down meld dialog */}
+        <Dialog open={showLayDown} onOpenChange={handleLayDownClose}>
+          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Turun Meld</DialogTitle>
+              <DialogDescription>
+                Pilih min. 3 kartu dari tangan untuk diturunkan sebagai meld
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {hand.map((card) => {
+                  const isSelected = selectedMeld.some((c) => cardEquals(c, card))
+                  return (
+                    <CardChip
+                      key={`${card.suit}-${card.rank}`}
+                      card={card}
+                      jokerRank={jokerRank}
+                      onClick={() => toggleMeldCard(card)}
+                      highlighted={isSelected}
+                      variant={isSelected ? "success" : "default"}
+                    />
+                  )
+                })}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  {selectedMeld.length} kartu dipilih
+                </span>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={handleLayDownClose}>
+                    Batal
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleLayDownConfirm}
+                    disabled={selectedMeld.length < 3}
+                  >
+                    Turunkan
+                  </Button>
+                </div>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </CardContent>

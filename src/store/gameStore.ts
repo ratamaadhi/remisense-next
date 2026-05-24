@@ -29,6 +29,7 @@ type GameState = {
   removeMeldGroup: (index: number) => void
   pickupFromDiscard: (cardsTaken: Card[], formedMeld: Card[], discardAfter: Card) => void
   opponentPickupFromDiscard: (cardsTaken: Card[], formedMeld: Card[], newDiscard: Card) => void
+  layDownMeld: (cards: Card[]) => void
   setRecommendation: (rec: Recommendation | null) => void
   resetGame: () => void
 }
@@ -130,7 +131,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   opponentPickupFromDiscard: (cardsTaken, formedMeld, newDiscard) => {
     const state = get()
-    // 1. Remove cardsTaken from discardPile
     const newDiscardPile = state.discardPile.filter(
       (c) => !cardsTaken.some((t) => cardEquals(t, c))
     )
@@ -138,6 +138,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({
       discardPile: [...newDiscardPile, newDiscard],
       visibleMelds: [...state.visibleMelds, formedMeld],
+    })
+  },
+
+  layDownMeld: (cards) => {
+    if (cards.length < 3) return
+    const state = get()
+    const newHand = state.hand.filter(
+      (c) => !cards.some((m) => cardEquals(m, c))
+    )
+    set({
+      hand: newHand,
+      visibleMelds: [...state.visibleMelds, cards],
     })
   },
 
