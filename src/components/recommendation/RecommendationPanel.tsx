@@ -143,7 +143,11 @@ export function RecommendationPanel() {
               </div>
             </>
           ) : (
-            <p className="text-sm text-red-700">Semua kartu adalah joker</p>
+            <div className="space-y-1">
+              {recommendation.reasons.map((reason, i) => (
+                <p key={i} className="text-sm text-red-700">{reason}</p>
+              ))}
+            </div>
           )}
         </div>
 
