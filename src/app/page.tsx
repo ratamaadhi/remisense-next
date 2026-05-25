@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useGameStore } from "@/store/gameStore"
-import { GameSetup } from "@/components/setup/GameSetup"
-import { HandArea } from "@/components/hand/HandArea"
-import { DiscardPile } from "@/components/discard/DiscardPile"
-import { MeldTable } from "@/components/melds/MeldTable"
-import { RecommendationPanel } from "@/components/recommendation/RecommendationPanel"
-import { formatCard } from "@/engine/cards/cardUtils"
-import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
-import { ThemeToggle } from "@/components/ThemeToggle"
+import { useState } from "react";
+import { useGameStore } from "@/store/gameStore";
+import { GameSetup } from "@/components/setup/GameSetup";
+import { HandArea } from "@/components/hand/HandArea";
+import { DiscardPile } from "@/components/discard/DiscardPile";
+import { MeldTable } from "@/components/melds/MeldTable";
+import { RecommendationPanel } from "@/components/recommendation/RecommendationPanel";
+import { formatCard } from "@/engine/cards/cardUtils";
+import { Button } from "@/components/ui/button";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
-  const { gamePhase, resetGame, jokerRank, jokerIndicator } = useGameStore()
-  const [showRecDrawer, setShowRecDrawer] = useState(false)
+  const { gamePhase, resetGame, jokerRank, jokerIndicator } = useGameStore();
+  const [showRecDrawer, setShowRecDrawer] = useState(false);
 
   if (gamePhase === "setup") {
     return (
@@ -22,20 +22,20 @@ export default function Home() {
         <div className="flex justify-end mb-4">
           <ThemeToggle />
         </div>
-        <h1 className="text-2xl font-bold text-center mb-2">RemiSense AI</h1>
+        <h1 className="text-2xl font-bold text-center mb-2">RemiSense</h1>
         <p className="text-center text-muted-foreground text-sm mb-8">
-          AI Recommendation Assistant untuk permainan kartu Remi
+          Recommendation Assistant untuk permainan kartu Remi
         </p>
         <GameSetup />
       </main>
-    )
+    );
   }
 
   return (
     <main className="max-w-6xl mx-auto p-4 py-6 pb-20 md:pb-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-xl font-bold">RemiSense AI</h1>
+          <h1 className="text-xl font-bold">RemiSense</h1>
           {jokerRank !== null && jokerIndicator && (
             <span className="text-xs text-purple-600">
               Joker: rank {jokerRank} ({formatCard(jokerIndicator)}) ★
@@ -68,10 +68,7 @@ export default function Home() {
 
       {/* Mobile: floating button to open recommendation drawer */}
       <div className="fixed bottom-4 left-0 right-0 flex justify-center md:hidden z-50">
-        <Button
-          onClick={() => setShowRecDrawer(true)}
-          className="shadow-lg rounded-full px-6"
-        >
+        <Button onClick={() => setShowRecDrawer(true)} className="shadow-lg rounded-full px-6">
           Lihat Rekomendasi
         </Button>
       </div>
@@ -88,5 +85,5 @@ export default function Home() {
         </DrawerContent>
       </Drawer>
     </main>
-  )
+  );
 }

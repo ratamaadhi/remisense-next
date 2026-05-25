@@ -12,7 +12,7 @@
 
 ## Product Name
 
-**RemiSense AI** *(working title)*
+**RemiSense** *(working title)*
 
 ## Product Type
 

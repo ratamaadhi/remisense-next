@@ -1,4 +1,4 @@
-# Design Doc: RemiSense AI — MVP
+# Design Doc: RemiSense — MVP
 
 **Tanggal:** 2026-05-24  
 **Status:** Approved  
@@ -8,9 +8,9 @@
 
 ## 1. Ringkasan Produk
 
-RemiSense AI adalah aplikasi web decision-support untuk permainan kartu Remi. Aplikasi membantu pemain membuat keputusan lebih baik dengan menganalisis kartu di tangan, tumpukan buangan, dan meld yang terlihat di meja, lalu memberikan rekomendasi buangan terbaik dan kombinasi terkuat.
+RemiSense adalah aplikasi web decision-support untuk permainan kartu Remi. Aplikasi membantu pemain membuat keputusan lebih baik dengan menganalisis kartu di tangan, tumpukan buangan, dan meld yang terlihat di meja, lalu memberikan rekomendasi buangan terbaik dan kombinasi terkuat.
 
-**Bukan** autonomous AI player — ini adalah "AI Recommendation Assistant".
+**Bukan** autonomous AI player — ini adalah "Recommendation Assistant".
 
 ---
 

@@ -1,4 +1,4 @@
-# RemiSense AI MVP Implementation Plan
+# RemiSense MVP Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox syntax for tracking.
 
@@ -2641,7 +2641,7 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   title: "RemiSense AI",
-  description: "AI Recommendation Assistant untuk permainan kartu Remi",
+  description: "Recommendation Assistant untuk permainan kartu Remi",
 }
 
 export default function RootLayout({
