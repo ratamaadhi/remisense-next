@@ -2,6 +2,10 @@ import { create } from "zustand"
 import type { Card, Recommendation, GamePhase } from "@/types"
 import { cardEquals } from "@/engine/cards/cardUtils"
 
+type UndoableAction =
+  | { type: "removeFromHand"; card: Card }
+  | { type: "addToDiscardPile"; card: Card }
+
 type GameState = {
   // setup state
   playerCount: number
@@ -14,16 +18,19 @@ type GameState = {
   discardPile: Card[]
   visibleMelds: Card[][]
   recommendation: Recommendation | null
+  lastAction: UndoableAction | null
 
   // setup actions
   setPlayerCount: (count: number) => void
   setJokerIndicator: (card: Card) => void
   addInitialDiscard: (card: Card) => void
+  removeInitialDiscard: (card: Card) => void
   startGame: () => void
 
   // playing actions
   addToHand: (card: Card) => void
   removeFromHand: (card: Card) => void
+  undoAddToHand: (card: Card) => void
   addToDiscardPile: (card: Card) => void
   addMeldGroup: (cards: Card[]) => void
   removeMeldGroup: (index: number) => void
@@ -31,6 +38,8 @@ type GameState = {
   opponentPickupFromDiscard: (cardsTaken: Card[], formedMeld: Card[], newDiscard: Card) => void
   layDownMeld: (cards: Card[]) => void
   setRecommendation: (rec: Recommendation | null) => void
+  undo: () => void
+  clearLastAction: () => void
   resetGame: () => void
 }
 
@@ -57,6 +66,7 @@ const initialState = {
   discardPile: [] as Card[],
   visibleMelds: [] as Card[][],
   recommendation: null as Recommendation | null,
+  lastAction: null as UndoableAction | null,
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -73,6 +83,11 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ discardPile: [...state.discardPile, card] })
   },
 
+  removeInitialDiscard: (card) => {
+    const state = get()
+    set({ discardPile: state.discardPile.filter((c) => !cardEquals(c, card)) })
+  },
+
   startGame: () => set({ gamePhase: "playing" }),
 
   addToHand: (card) => {
@@ -85,13 +100,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     const state = get()
     const newHand = state.hand.filter((c) => !cardEquals(c, card))
     if (newHand.length === state.hand.length) return // card wasn't in hand
-    set({ hand: newHand, discardPile: [...state.discardPile, card] })
+    set({ hand: newHand, discardPile: [...state.discardPile, card], lastAction: { type: "removeFromHand", card } })
+  },
+
+  undoAddToHand: (card) => {
+    const state = get()
+    set({ hand: state.hand.filter((c) => !cardEquals(c, card)) })
   },
 
   addToDiscardPile: (card) => {
     const state = get()
     if (isCardUsed(card, state)) return
-    set({ discardPile: [...state.discardPile, card] })
+    set({ discardPile: [...state.discardPile, card], lastAction: { type: "addToDiscardPile", card } })
   },
 
   addMeldGroup: (cards) => {
@@ -154,6 +174,28 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   setRecommendation: (rec) => set({ recommendation: rec }),
+
+  undo: () => {
+    const state = get()
+    if (!state.lastAction) return
+    const { type, card } = state.lastAction
+    if (type === "removeFromHand") {
+      // Move card back from discard to hand
+      set({
+        hand: [...state.hand, card],
+        discardPile: state.discardPile.filter((c) => !cardEquals(c, card)),
+        lastAction: null,
+      })
+    } else if (type === "addToDiscardPile") {
+      // Remove card from discard pile
+      set({
+        discardPile: state.discardPile.filter((c) => !cardEquals(c, card)),
+        lastAction: null,
+      })
+    }
+  },
+
+  clearLastAction: () => set({ lastAction: null }),
 
   resetGame: () => set({ ...initialState }),
 }))

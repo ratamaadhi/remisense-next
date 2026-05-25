@@ -36,8 +36,9 @@ export function GameSetup() {
     jokerRank,
     setPlayerCount,
     addToHand,
-    removeFromHand,
+    undoAddToHand,
     addInitialDiscard,
+    removeInitialDiscard,
     setJokerIndicator,
     startGame,
   } = useGameStore();
@@ -112,7 +113,7 @@ export function GameSetup() {
                 <CardChip
                   key={`${card.suit}-${card.rank}`}
                   card={card}
-                  onClick={() => removeFromHand(card)}
+                  onClick={() => undoAddToHand(card)}
                 />
               ))}
             </div>
@@ -212,6 +213,20 @@ export function GameSetup() {
               onSelect={handlePickerSelect}
               onClose={() => setShowPicker(false)}
               autoClose={pickerTarget === "joker"}
+              onDeselect={
+                pickerTarget === "hand"
+                  ? undoAddToHand
+                  : pickerTarget === "discard"
+                    ? removeInitialDiscard
+                    : undefined
+              }
+              deselectableCards={
+                pickerTarget === "hand"
+                  ? hand
+                  : pickerTarget === "discard"
+                    ? discardPile
+                    : undefined
+              }
             />
           </DialogContent>
         </Dialog>

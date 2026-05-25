@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGameStore } from "@/store/gameStore";
 import { CardChip } from "./CardChip";
 import { CardPicker } from "./CardPicker";
@@ -13,14 +13,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { cardEquals } from "@/engine/cards/cardUtils";
+import { cardEquals, formatCard } from "@/engine/cards/cardUtils";
 import type { Card as CardType } from "@/types";
 
 export function HandArea() {
-  const { hand, jokerRank, addToHand, removeFromHand, layDownMeld } = useGameStore();
+  const { hand, jokerRank, addToHand, removeFromHand, undoAddToHand, layDownMeld, lastAction, undo, clearLastAction } = useGameStore();
   const [showPicker, setShowPicker] = useState(false);
   const [showLayDown, setShowLayDown] = useState(false);
   const [selectedMeld, setSelectedMeld] = useState<CardType[]>([]);
+
+  // Auto-dismiss undo after 5 seconds
+  useEffect(() => {
+    if (lastAction?.type === "removeFromHand") {
+      const timer = setTimeout(clearLastAction, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [lastAction, clearLastAction]);
 
   function toggleMeldCard(card: CardType) {
     setSelectedMeld((prev) =>
@@ -76,6 +84,17 @@ export function HandArea() {
           </Button>
         </div>
 
+        {lastAction?.type === "removeFromHand" && (
+          <div className="flex items-center gap-2 mt-3 p-2 bg-amber-50 border border-amber-200 rounded-md">
+            <span className="text-sm text-amber-800">
+              {formatCard(lastAction.card)} dibuang
+            </span>
+            <Button variant="outline" size="sm" className="ml-auto text-amber-700 border-amber-300 hover:bg-amber-100" onClick={undo}>
+              Undo
+            </Button>
+          </div>
+        )}
+
         {/* Add card dialog */}
         <Dialog open={showPicker} onOpenChange={setShowPicker}>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
@@ -86,6 +105,8 @@ export function HandArea() {
             <CardPicker
               onSelect={(card: CardType) => addToHand(card)}
               onClose={() => setShowPicker(false)}
+              onDeselect={undoAddToHand}
+              deselectableCards={hand}
             />
           </DialogContent>
         </Dialog>

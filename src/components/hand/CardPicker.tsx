@@ -13,6 +13,8 @@ type CardPickerProps = {
   multiSelect?: boolean;
   onMultiSelect?: (cards: Card[]) => void;
   autoClose?: boolean;
+  onDeselect?: (card: Card) => void;
+  deselectableCards?: Card[];
 };
 
 const SUIT_ORDER: Suit[] = ["spade", "heart", "club", "diamond"];
@@ -36,6 +38,8 @@ export function CardPicker({
   multiSelect = false,
   onMultiSelect,
   autoClose = true,
+  onDeselect,
+  deselectableCards = [],
 }: CardPickerProps) {
   const { hand, discardPile, visibleMelds, jokerIndicator } = useGameStore();
   const [selected, setSelected] = useState<Card[]>([]);
@@ -47,7 +51,13 @@ export function CardPicker({
     ...(jokerIndicator ? [jokerIndicator] : []),
   ];
 
+  function isDeselectable(card: Card): boolean {
+    return deselectableCards.some((c) => cardEquals(c, card));
+  }
+
   function isUsed(card: Card): boolean {
+    // If onDeselect is provided and card is deselectable, it's not "used"
+    if (onDeselect && isDeselectable(card)) return false;
     return usedCards.some((c) => cardEquals(c, card));
   }
 
@@ -57,6 +67,12 @@ export function CardPicker({
 
   function handleCardClick(card: Card) {
     if (isUsed(card)) return;
+
+    // If card is deselectable and onDeselect is provided, remove it
+    if (onDeselect && isDeselectable(card)) {
+      onDeselect(card);
+      return;
+    }
 
     if (multiSelect) {
       if (isSelected(card)) {
@@ -95,6 +111,7 @@ export function CardPicker({
                 const card: Card = { suit, rank };
                 const used = isUsed(card);
                 const sel = isSelected(card);
+                const inHand = onDeselect && isDeselectable(card);
                 const label = RANK_LABELS[rank] ?? String(rank);
 
                 return (
@@ -108,14 +125,19 @@ export function CardPicker({
                       "w-8 h-10 text-xs font-mono font-bold rounded-md border transition-all",
                       used
                         ? "opacity-30 cursor-not-allowed bg-muted border-border text-muted-foreground"
-                        : sel
+                        : inHand
                           ? cn(
-                              "bg-blue-100 border-blue-400 ring-2 ring-blue-300",
+                              "bg-green-100 border-green-400 ring-2 ring-green-300 cursor-pointer hover:bg-red-100 hover:border-red-400 hover:ring-red-300",
                               isRed ? "text-red-600" : "text-foreground",
                             )
-                          : isRed
-                            ? "text-red-600 border-red-200 hover:bg-red-50 bg-white"
-                            : "text-foreground border-border hover:bg-muted bg-white",
+                          : sel
+                            ? cn(
+                                "bg-blue-100 border-blue-400 ring-2 ring-blue-300",
+                                isRed ? "text-red-600" : "text-foreground",
+                              )
+                            : isRed
+                              ? "text-red-600 border-red-200 hover:bg-red-50 bg-white"
+                              : "text-foreground border-border hover:bg-muted bg-white",
                     )}
                   >
                     {label}
