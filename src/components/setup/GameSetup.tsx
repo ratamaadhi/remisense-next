@@ -31,6 +31,7 @@ export function GameSetup() {
     setPlayerCount,
     addToHand,
     undoAddToHand,
+    removeFromHand,
     addInitialDiscard,
     removeInitialDiscard,
     setJokerIndicator,
@@ -40,6 +41,7 @@ export function GameSetup() {
   const [step, setStep] = useState<SetupStep>("playerCount");
   const [showPicker, setShowPicker] = useState(false);
   const [pickerTarget, setPickerTarget] = useState<"hand" | "discard" | "joker">("hand");
+  const [discardedFromHand, setDiscardedFromHand] = useState<CardType[]>([]);
 
   function openPicker(target: "hand" | "discard" | "joker") {
     setPickerTarget(target);
@@ -49,13 +51,14 @@ export function GameSetup() {
   function handlePickerSelect(card: CardType) {
     if (pickerTarget === "hand") {
       addToHand(card)
-      // Auto-close when 7 cards reached (hand.length is pre-update, so check for 6)
-      if (hand.length >= 6) {
-        setShowPicker(false)
-      }
     } else if (pickerTarget === "discard") {
-      addInitialDiscard(card)
-      // Auto-close when playerCount reached
+      // Check if card is from hand
+      if (hand.some((c) => c.suit === card.suit && c.rank === card.rank)) {
+        removeFromHand(card)
+        setDiscardedFromHand((prev) => [...prev, card])
+      } else {
+        addInitialDiscard(card)
+      }
       if (discardPile.length >= playerCount - 1) {
         setShowPicker(false)
       }
@@ -63,6 +66,19 @@ export function GameSetup() {
       setJokerIndicator(card)
       setStep("done")
       setShowPicker(false)
+    }
+  }
+
+  function handleDiscardDeselect(card: CardType) {
+    // Check if this card was originally from hand
+    const wasFromHand = discardedFromHand.some((c) => c.suit === card.suit && c.rank === card.rank)
+    if (wasFromHand) {
+      // Remove from discard pile and add back to hand
+      removeInitialDiscard(card)
+      addToHand(card)
+      setDiscardedFromHand((prev) => prev.filter((c) => !(c.suit === card.suit && c.rank === card.rank)))
+    } else {
+      removeInitialDiscard(card)
     }
   }
 
@@ -100,7 +116,7 @@ export function GameSetup() {
         {step === "hand" && (
           <div>
             <p className="text-sm text-muted-foreground mb-3">
-              Masukkan 7 kartu di tangan Anda ({hand.length}/7)
+              Masukkan kartu di tangan Anda ({hand.length} kartu, min. 7)
             </p>
             <div className="flex flex-wrap gap-1 mb-3 min-h-[32px]">
               {hand.map((card) => (
@@ -112,11 +128,13 @@ export function GameSetup() {
               ))}
             </div>
             <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setStep("playerCount")}>
+                &larr; Kembali
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => openPicker("hand")}
-                disabled={hand.length >= 7}
               >
                 + Tambah Kartu
               </Button>
@@ -135,19 +153,24 @@ export function GameSetup() {
             <p className="text-sm text-muted-foreground mb-3">
               Masukkan kartu buangan awal dari semua pemain ({discardPile.length}/{playerCount})
             </p>
+            <p className="text-xs text-blue-600 mb-3">
+              Kartu biru muda = kartu di tangan Anda (bisa dipilih untuk dibuang)
+            </p>
             <div className="flex flex-wrap gap-1 mb-3 min-h-[32px]">
               {discardPile.map((card, i) => (
                 <CardChip key={`${card.suit}-${card.rank}-${i}`} card={card} disabled />
               ))}
             </div>
             <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setStep("hand")}>
+                &larr; Kembali
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => openPicker("discard")}
-                disabled={discardPile.length >= playerCount}
               >
-                + Tambah Buangan
+                {discardPile.length >= playerCount ? "Ganti" : "+ Tambah Buangan"}
               </Button>
               {discardPile.length >= playerCount && (
                 <Button size="sm" onClick={() => setStep("joker")}>
@@ -176,6 +199,21 @@ export function GameSetup() {
                 + Pilih Kartu Penentu Joker
               </Button>
             )}
+            <div className="flex gap-2 mt-3">
+              <Button variant="ghost" size="sm" onClick={() => setStep("initialDiscard")}>
+                &larr; Kembali
+              </Button>
+              {jokerIndicator && (
+                <>
+                  <Button variant="outline" size="sm" onClick={() => openPicker("joker")}>
+                    Ganti
+                  </Button>
+                  <Button size="sm" onClick={() => setStep("done")}>
+                    Lanjut &rarr;
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         )}
 
@@ -192,9 +230,14 @@ export function GameSetup() {
                 {jokerIndicator && ` (${formatCard(jokerIndicator)})`}
               </div>
             </div>
-            <Button className="w-full" onClick={startGame}>
-              Mulai Permainan
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setStep("joker")}>
+                &larr; Kembali
+              </Button>
+              <Button className="flex-1" onClick={startGame}>
+                Mulai Permainan
+              </Button>
+            </div>
           </div>
         )}
 
@@ -207,7 +250,7 @@ export function GameSetup() {
                 pickerTarget === "hand"
                   ? undoAddToHand
                   : pickerTarget === "discard"
-                    ? removeInitialDiscard
+                    ? handleDiscardDeselect
                     : undefined
               }
               deselectableCards={
@@ -217,6 +260,7 @@ export function GameSetup() {
                     ? discardPile
                     : undefined
               }
+              selectableHandCards={pickerTarget === "discard" && discardedFromHand.length === 0}
             />
         </ResponsiveDialog>
       </CardContent>

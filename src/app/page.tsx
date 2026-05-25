@@ -10,6 +10,7 @@ import { RecommendationPanel } from "@/components/recommendation/RecommendationP
 import { formatCard } from "@/engine/cards/cardUtils"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 export default function Home() {
   const { gamePhase, resetGame, jokerRank, jokerIndicator } = useGameStore()
@@ -18,6 +19,9 @@ export default function Home() {
   if (gamePhase === "setup") {
     return (
       <main className="max-w-2xl mx-auto p-4 py-8">
+        <div className="flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
         <h1 className="text-2xl font-bold text-center mb-2">RemiSense AI</h1>
         <p className="text-center text-muted-foreground text-sm mb-8">
           AI Recommendation Assistant untuk permainan kartu Remi
@@ -38,9 +42,12 @@ export default function Home() {
             </span>
           )}
         </div>
-        <Button variant="destructive" size="sm" onClick={resetGame}>
-          Reset Permainan
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button variant="destructive" size="sm" onClick={resetGame}>
+            Reset Permainan
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

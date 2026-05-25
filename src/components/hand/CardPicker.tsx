@@ -15,6 +15,7 @@ type CardPickerProps = {
   autoClose?: boolean;
   onDeselect?: (card: Card) => void;
   deselectableCards?: Card[];
+  selectableHandCards?: boolean;
 };
 
 const SUIT_ORDER: Suit[] = ["spade", "heart", "club", "diamond"];
@@ -40,6 +41,7 @@ export function CardPicker({
   autoClose = true,
   onDeselect,
   deselectableCards = [],
+  selectableHandCards = false,
 }: CardPickerProps) {
   const { hand, discardPile, visibleMelds, jokerIndicator } = useGameStore();
   const [selected, setSelected] = useState<Card[]>([]);
@@ -51,6 +53,10 @@ export function CardPicker({
     ...(jokerIndicator ? [jokerIndicator] : []),
   ];
 
+  function isInHand(card: Card): boolean {
+    return hand.some((c) => cardEquals(c, card));
+  }
+
   function isDeselectable(card: Card): boolean {
     return deselectableCards.some((c) => cardEquals(c, card));
   }
@@ -58,6 +64,8 @@ export function CardPicker({
   function isUsed(card: Card): boolean {
     // If onDeselect is provided and card is deselectable, it's not "used"
     if (onDeselect && isDeselectable(card)) return false;
+    // If selectableHandCards is true, hand cards are not "used"
+    if (selectableHandCards && isInHand(card)) return false;
     return usedCards.some((c) => cardEquals(c, card));
   }
 
@@ -112,6 +120,7 @@ export function CardPicker({
                 const used = isUsed(card);
                 const sel = isSelected(card);
                 const inHand = onDeselect && isDeselectable(card);
+                const handSelectable = selectableHandCards && isInHand(card);
                 const label = RANK_LABELS[rank] ?? String(rank);
 
                 return (
@@ -128,16 +137,21 @@ export function CardPicker({
                         : inHand
                           ? cn(
                               "bg-green-100 border-green-400 ring-2 ring-green-300 cursor-pointer hover:bg-red-100 hover:border-red-400 hover:ring-red-300",
-                              isRed ? "text-red-600" : "text-foreground",
+                              isRed ? "text-red-600" : "text-gray-900",
                             )
-                          : sel
+                          : handSelectable
                             ? cn(
-                                "bg-blue-100 border-blue-400 ring-2 ring-blue-300",
-                                isRed ? "text-red-600" : "text-foreground",
+                                "bg-blue-50 border-blue-300 ring-1 ring-blue-200 cursor-pointer hover:bg-blue-100",
+                                isRed ? "text-red-600" : "text-gray-900",
                               )
-                            : isRed
-                              ? "text-red-600 border-red-200 hover:bg-red-50 bg-white"
-                              : "text-foreground border-border hover:bg-muted bg-white",
+                            : sel
+                              ? cn(
+                                  "bg-blue-100 border-blue-400 ring-2 ring-blue-300",
+                                  isRed ? "text-red-600" : "text-gray-900",
+                                )
+                              : isRed
+                                ? "text-red-600 border-red-200 hover:bg-red-50 bg-white"
+                                : "text-gray-900 border-gray-300 hover:bg-gray-100 bg-white",
                     )}
                   >
                     {label}
