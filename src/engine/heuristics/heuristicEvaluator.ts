@@ -64,10 +64,10 @@ export function scoreCard(card: Card, context: GameContext): number {
   const isInNearMeld = nearMeldsWithCard.length > 0
   const deadRisk = isInMeld ? 0 : isInNearMeld ? 0.3 : 1.0
 
-  // highPointPenalty: only penalize high-value cards (rank >= 10)
-  // Low cards (rank < 10) have minimal penalty to avoid over-penalizing useful cards
+  // highPointPenalty: normalized [0, 1] based on card point value
+  // A=15 → 1.0 (highest risk), J/Q/K=10 → 0.67, 2-10=5 → 0.33
   const pointValue = getRankValue(card)
-  const highPointPenalty = card.rank >= 10 ? pointValue / 10 : card.rank / 130
+  const highPointPenalty = pointValue / 15
 
   const score =
     (comboPotential * 40) +

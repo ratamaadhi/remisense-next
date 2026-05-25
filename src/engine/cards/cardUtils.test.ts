@@ -48,11 +48,13 @@ describe("cardEquals", () => {
 })
 
 describe("getRankValue", () => {
-  it("returns rank value for number cards", () => {
-    expect(getRankValue({ suit: "spade", rank: 7 })).toBe(7)
+  it("returns 15 for Ace", () => {
+    expect(getRankValue({ suit: "spade", rank: 1 })).toBe(15)
   })
-  it("returns 10 for rank 10", () => {
-    expect(getRankValue({ suit: "spade", rank: 10 })).toBe(10)
+  it("returns 5 for number cards (2-10)", () => {
+    expect(getRankValue({ suit: "spade", rank: 2 })).toBe(5)
+    expect(getRankValue({ suit: "spade", rank: 7 })).toBe(5)
+    expect(getRankValue({ suit: "spade", rank: 10 })).toBe(5)
   })
   it("returns 10 for J", () => {
     expect(getRankValue({ suit: "spade", rank: 11 })).toBe(10)

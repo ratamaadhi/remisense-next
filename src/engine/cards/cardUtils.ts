@@ -55,13 +55,15 @@ export function cardEquals(a: Card, b: Card): boolean {
 }
 
 /**
- * Returns the point value of a card for penalty scoring.
- * Face cards (J/Q/K) = 10 points. Number cards = face value.
- * Ace = 1 point (low value in this implementation).
+ * Returns the point value of a card based on Indonesian Remi scoring rules.
+ * Ace (A) = 15 points (highest risk/reward — can only form sets)
+ * 2-10 = 5 points each (equal value for all number cards)
+ * J/Q/K = 10 points (face cards)
  */
 export function getRankValue(card: Card): number {
+  if (card.rank === 1) return 15
   if (card.rank >= 11) return 10
-  return card.rank
+  return 5
 }
 
 /**
