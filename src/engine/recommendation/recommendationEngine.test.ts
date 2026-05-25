@@ -187,3 +187,50 @@ describe("analyzeDiscardPickup", () => {
     expect(result.options).toHaveLength(0)
   })
 })
+
+describe("joker meld extension bug fixes", () => {
+  it("recommends null discard when joker completes all cards into melds (2S 3S 4S KH KD KC JS★)", () => {
+    // Hand: 2S 3S 4S KH KD KC JS★ (joker rank=11)
+    // Expected: JS joins King set → all 7 cards in melds → discard null
+    const hand: Card[] = [
+      { suit: "spade", rank: 2 },
+      { suit: "spade", rank: 3 },
+      { suit: "spade", rank: 4 },
+      { suit: "heart", rank: 13 },
+      { suit: "diamond", rank: 13 },
+      { suit: "club", rank: 13 },
+      { suit: "spade", rank: 11 }, // joker rank = 11
+    ]
+    const result = analyze(hand, [], [], 11, null)
+    expect(result.discard).toBeNull()
+  })
+
+  it("does not recommend discarding a King when joker can join the King set", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 2 },
+      { suit: "spade", rank: 3 },
+      { suit: "spade", rank: 4 },
+      { suit: "heart", rank: 13 },
+      { suit: "diamond", rank: 13 },
+      { suit: "club", rank: 13 },
+      { suit: "spade", rank: 11 }, // joker rank = 11
+    ]
+    const result = analyze(hand, [], [], 11, null)
+    expect(result.discard?.rank).not.toBe(13)
+  })
+
+  it("all 7 cards are in completed melds when joker extends a meld", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 2 },
+      { suit: "spade", rank: 3 },
+      { suit: "spade", rank: 4 },
+      { suit: "heart", rank: 13 },
+      { suit: "diamond", rank: 13 },
+      { suit: "club", rank: 13 },
+      { suit: "spade", rank: 11 }, // joker rank = 11
+    ]
+    const result = analyze(hand, [], [], 11, null)
+    const totalMeldCards = result.strongestCombos.reduce((sum, m) => sum + m.cards.length, 0)
+    expect(totalMeldCards).toBe(7)
+  })
+})

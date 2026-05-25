@@ -57,8 +57,14 @@ export function analyze(
   // Sort ascending — lowest score first (best discard candidate)
   cardScores.sort((a, b) => a.score - b.score)
 
-  // Pick discard: lowest score card that is NOT a joker
-  const discardCandidate = cardScores.find((cs) => !isJoker(cs.card, jokerRank))
+  // If all cards are in completed melds, no discard needed
+  const allCardsInMelds =
+    allocation.completedMelds.flatMap((m) => m.cards).length === hand.length
+
+  // Pick discard: lowest score card that is NOT a joker, unless hand is complete
+  const discardCandidate = allCardsInMelds
+    ? null
+    : cardScores.find((cs) => !isJoker(cs.card, jokerRank))
   const discard = discardCandidate ? discardCandidate.card : null
 
   // Generate reasons in Indonesian
