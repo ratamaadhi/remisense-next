@@ -77,7 +77,7 @@ export default function Home() {
       <Drawer open={showRecDrawer} onOpenChange={setShowRecDrawer}>
         <DrawerContent className="max-h-[85vh] px-4 pb-6">
           <DrawerHeader className="text-left px-0">
-            <DrawerTitle>Rekomendasi</DrawerTitle>
+            <DrawerTitle></DrawerTitle>
           </DrawerHeader>
           <div className="overflow-y-auto">
             <RecommendationPanel />
