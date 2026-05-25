@@ -95,7 +95,33 @@ export function detectSequences(hand: Card[], jokerRank: number | null): Meld[] 
         }
       }
 
-      // Enumerate all sub-sequences of length >= 3 from this run
+      // Try to extend run with unused joker at the END
+      const availableJoker = jokers.length - usedJokers > 0 ? jokers[usedJokers] : null
+      if (availableJoker) {
+        const extendEndRank = currentRank + 1
+        if (extendEndRank <= 13 && !isForbiddenSequenceTransition(currentRank, extendEndRank)) {
+          const runWithEnd = [...run, availableJoker]
+          for (let start = 0; start <= runWithEnd.length - 3; start++) {
+            for (let end = start + 3; end <= runWithEnd.length; end++) {
+              melds.push({ cards: runWithEnd.slice(start, end), type: "sequence" })
+            }
+          }
+        }
+
+        // Try to extend run with unused joker at the START
+        const firstRank = run[0].rank
+        const extendStartRank = firstRank - 1
+        if (extendStartRank >= 2 && !isForbiddenSequenceTransition(extendStartRank, firstRank)) {
+          const runWithStart = [availableJoker, ...run]
+          for (let start = 0; start <= runWithStart.length - 3; start++) {
+            for (let end = start + 3; end <= runWithStart.length; end++) {
+              melds.push({ cards: runWithStart.slice(start, end), type: "sequence" })
+            }
+          }
+        }
+      }
+
+      // Enumerate all sub-sequences of length >= 3 from the base run (without extension)
       for (let start = 0; start <= run.length - 3; start++) {
         for (let end = start + 3; end <= run.length; end++) {
           melds.push({ cards: run.slice(start, end), type: "sequence" })

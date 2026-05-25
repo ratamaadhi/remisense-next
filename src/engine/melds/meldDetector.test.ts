@@ -178,6 +178,62 @@ describe("detectSequences", () => {
     const seqs = detectSequences(hand, 5)
     expect(seqs).toHaveLength(0)
   })
+
+  it("extends sequence at end using joker (2S-3S-4S + joker as 5S)", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 2 },
+      { suit: "spade", rank: 3 },
+      { suit: "spade", rank: 4 },
+      { suit: "spade", rank: 11 }, // joker rank = 11
+    ]
+    const seqs = detectSequences(hand, 11)
+    const fourCardSeq = seqs.find((s) => s.cards.length === 4)
+    expect(fourCardSeq).toBeDefined()
+    expect(fourCardSeq!.type).toBe("sequence")
+  })
+
+  it("extends sequence at start using joker (joker as 4S + 5S-6S-7S)", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 5 },
+      { suit: "spade", rank: 6 },
+      { suit: "spade", rank: 7 },
+      { suit: "heart", rank: 11 }, // joker rank = 11
+    ]
+    const seqs = detectSequences(hand, 11)
+    const fourCardSeq = seqs.find((s) => s.cards.length === 4)
+    expect(fourCardSeq).toBeDefined()
+  })
+
+  it("does not extend 8S-9S-10S across 10-J boundary using joker", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 8 },
+      { suit: "spade", rank: 9 },
+      { suit: "spade", rank: 10 },
+      { suit: "heart", rank: 3 }, // joker rank = 3
+    ]
+    const seqs = detectSequences(hand, 3)
+    // joker must NOT produce a sequence containing rank 11 (J)
+    const crossesBoundary = seqs.some((s) =>
+      s.cards.some((c) => c.rank === 10) && s.cards.some((c) => c.rank === 11)
+    )
+    expect(crossesBoundary).toBe(false)
+  })
+
+  it("does not extend 2S-3S-4S before rank 2 using joker (A-2 boundary)", () => {
+    const hand: Card[] = [
+      { suit: "spade", rank: 2 },
+      { suit: "spade", rank: 3 },
+      { suit: "spade", rank: 4 },
+      { suit: "heart", rank: 5 }, // joker rank = 5
+    ]
+    const seqs = detectSequences(hand, 5)
+    // joker as rank 1 (A) would require A→2 transition which is forbidden
+    // no sequence should contain rank 1 adjacent to rank 2
+    const crossesBoundary = seqs.some((s) =>
+      s.cards.some((c) => c.rank === 1) && s.cards.some((c) => c.rank === 2)
+    )
+    expect(crossesBoundary).toBe(false)
+  })
 })
 
 describe("detectNearMelds", () => {
