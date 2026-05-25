@@ -70,7 +70,9 @@ export function analyze(
   // Generate reasons in Indonesian
   const reasons = discard
     ? generateReasons(discard, context, allocation, nearMelds)
-    : ["Semua kartu adalah joker"]
+    : allCardsInMelds
+      ? ["Tangan lengkap — semua kartu membentuk meld"]
+      : ["Semua kartu adalah joker"]
 
   // Identify risky cards: high-rank cards with low strategic value (score < 15 and rank >= 10)
   // Note: score < 15 captures cards that are isolated OR in near-melds with very low completion probability
