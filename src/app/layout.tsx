@@ -14,8 +14,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
-      <body className="bg-background min-h-screen antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className="bg-background flex min-h-screen flex-col antialiased">
+        <ThemeProvider>
+          <main className="flex-1">{children}</main>
+          <footer className="border-t py-3 text-center text-xs text-muted-foreground">
+            <p>Dibuat oleh Ratama Adhi</p>
+          </footer>
+        </ThemeProvider>
       </body>
     </html>
   );

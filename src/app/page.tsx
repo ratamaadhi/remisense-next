@@ -67,7 +67,7 @@ export default function Home() {
       </div>
 
       {/* Mobile: floating button to open recommendation drawer */}
-      <div className="fixed bottom-4 left-0 right-0 flex justify-center md:hidden z-50">
+      <div className="fixed bottom-12 left-0 right-0 flex justify-center md:hidden z-50">
         <Button onClick={() => setShowRecDrawer(true)} className="shadow-lg rounded-full px-6">
           Lihat Rekomendasi
         </Button>
