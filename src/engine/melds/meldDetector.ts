@@ -35,12 +35,24 @@ export function detectSets(hand: Card[], jokerRank: number | null): Meld[] {
   for (const [, cards] of byRank) {
     if (cards.length >= 3) {
       melds.push({ cards: [...cards], type: "set" })
-      // Also generate a joker-extended set if joker is available
-      if (jokers.length > 0) {
-        melds.push({ cards: [...cards, jokers[0]], type: "set" })
+      // Generate joker-extended sets (up to 4 cards max in a set)
+      const maxExtend = Math.min(jokers.length, 4 - cards.length)
+      for (let n = 1; n <= maxExtend; n++) {
+        melds.push({ cards: [...cards, ...jokers.slice(0, n)], type: "set" })
       }
-    } else if (cards.length === 2 && jokers.length > 0) {
-      melds.push({ cards: [...cards, jokers[0]], type: "set" })
+    } else if (cards.length === 2) {
+      // 2 cards + jokers to form set of 3 or 4
+      const maxJokers = Math.min(jokers.length, 2)
+      for (let n = 1; n <= maxJokers; n++) {
+        melds.push({ cards: [...cards, ...jokers.slice(0, n)], type: "set" })
+      }
+    } else if (cards.length === 1 && jokers.length >= 2) {
+      // 1 card + 2 jokers = set of 3
+      melds.push({ cards: [...cards, ...jokers.slice(0, 2)], type: "set" })
+      // 1 card + 3 jokers = set of 4
+      if (jokers.length >= 3) {
+        melds.push({ cards: [...cards, ...jokers.slice(0, 3)], type: "set" })
+      }
     }
   }
 
@@ -222,13 +234,12 @@ export function detectNearMelds(hand: Card[], jokerRank: number | null): NearMel
         (nm) => nm.type === "near-set" && nm.cards.some((c) => cardEquals(c, card))
       )
       if (!alreadyCovered) {
+        // Use up to available jokers for near-set candidates
+        const jokersForNearMeld = Math.min(jokers.length, 2)
         nearMelds.push({
-          cards: [card, jokers[0]],
+          cards: [card, ...jokers.slice(0, jokersForNearMeld)],
           type: "near-set",
-          neededCards: neededForSet.slice(0, 1), // need 1 more
-          // completionProbability is intentionally 0 here.
-          // It will be calculated by probabilityTracker.getCompletionProbability()
-          // when the recommendation engine builds the full GameContext.
+          neededCards: jokersForNearMeld >= 2 ? [] : neededForSet.slice(0, 1),
           completionProbability: 0,
         })
       }
