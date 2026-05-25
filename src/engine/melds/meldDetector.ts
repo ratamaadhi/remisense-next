@@ -107,9 +107,10 @@ export function detectSequences(hand: Card[], jokerRank: number | null): Meld[] 
         }
       }
 
-      // Try to extend run with unused joker at the END
-      const availableJoker = jokers.length - usedJokers > 0 ? jokers[usedJokers] : null
-      if (availableJoker) {
+      // Try to extend run with each available unused joker at the END and START
+      for (let ji = usedJokers; ji < jokers.length; ji++) {
+        const availableJoker = jokers[ji]
+
         const extendEndRank = currentRank + 1
         if (extendEndRank <= 13 && !isForbiddenSequenceTransition(currentRank, extendEndRank)) {
           const runWithEnd = [...run, availableJoker]
@@ -120,7 +121,7 @@ export function detectSequences(hand: Card[], jokerRank: number | null): Meld[] 
           }
         }
 
-        // Try to extend run with unused joker at the START
+        // Try to extend run with this joker at the START
         const firstRank = run[0].rank
         const extendStartRank = firstRank - 1
         if (extendStartRank >= 2 && !isForbiddenSequenceTransition(extendStartRank, firstRank)) {
