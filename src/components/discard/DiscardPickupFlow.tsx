@@ -8,13 +8,7 @@ import { analyzeDiscardPickup } from "@/engine/recommendation/recommendationEngi
 import { getTopNDiscards } from "@/engine/probability/probabilityTracker"
 import { cardEquals } from "@/engine/cards/cardUtils"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog"
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog"
 import type { Card as CardType, DiscardPickupOption } from "@/types"
 
 type DiscardPickupFlowProps = {
@@ -86,16 +80,12 @@ export function DiscardPickupFlow({ mode, onClose }: DiscardPickupFlowProps) {
   }
 
   return (
-    <Dialog open={true} onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {mode === "self" ? "Ambil dari Buangan" : "Catat Ambil Pemain Lain"}
-          </DialogTitle>
-          <DialogDescription>
-            Langkah {step} dari 3
-          </DialogDescription>
-        </DialogHeader>
+    <ResponsiveDialog
+      open={true}
+      onOpenChange={() => onClose()}
+      title={mode === "self" ? "Ambil dari Buangan" : "Catat Ambil Pemain Lain"}
+      description={`Langkah ${step} dari 3`}
+    >
 
         {/* Step 1: Pick Target */}
         {step === 1 && (
@@ -249,7 +239,6 @@ export function DiscardPickupFlow({ mode, onClose }: DiscardPickupFlowProps) {
             />
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   )
 }

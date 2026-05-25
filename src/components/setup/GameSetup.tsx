@@ -8,13 +8,7 @@ import { formatCard } from "@/engine/cards/cardUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import type { Card as CardType } from "@/types";
 
 type SetupStep = "playerCount" | "hand" | "initialDiscard" | "joker" | "done";
@@ -204,11 +198,7 @@ export function GameSetup() {
           </div>
         )}
 
-        <Dialog open={showPicker} onOpenChange={setShowPicker}>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Pilih Kartu</DialogTitle>
-            </DialogHeader>
+        <ResponsiveDialog open={showPicker} onOpenChange={setShowPicker} title="Pilih Kartu">
             <CardPicker
               onSelect={handlePickerSelect}
               onClose={() => setShowPicker(false)}
@@ -228,8 +218,7 @@ export function GameSetup() {
                     : undefined
               }
             />
-          </DialogContent>
-        </Dialog>
+        </ResponsiveDialog>
       </CardContent>
     </Card>
   );

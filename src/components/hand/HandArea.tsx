@@ -6,13 +6,7 @@ import { CardChip } from "./CardChip";
 import { CardPicker } from "./CardPicker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { cardEquals, formatCard } from "@/engine/cards/cardUtils";
 import type { Card as CardType } from "@/types";
 
@@ -96,30 +90,27 @@ export function HandArea() {
         )}
 
         {/* Add card dialog */}
-        <Dialog open={showPicker} onOpenChange={setShowPicker}>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Pilih Kartu</DialogTitle>
-              <DialogDescription>Pilih kartu untuk ditambahkan ke tangan</DialogDescription>
-            </DialogHeader>
+        <ResponsiveDialog
+          open={showPicker}
+          onOpenChange={setShowPicker}
+          title="Pilih Kartu"
+          description="Pilih kartu untuk ditambahkan ke tangan"
+        >
             <CardPicker
               onSelect={(card: CardType) => addToHand(card)}
               onClose={() => setShowPicker(false)}
               onDeselect={undoAddToHand}
               deselectableCards={hand}
             />
-          </DialogContent>
-        </Dialog>
+        </ResponsiveDialog>
 
         {/* Lay down meld dialog */}
-        <Dialog open={showLayDown} onOpenChange={handleLayDownClose}>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Turun Meld</DialogTitle>
-              <DialogDescription>
-                Pilih min. 3 kartu dari tangan untuk diturunkan sebagai meld
-              </DialogDescription>
-            </DialogHeader>
+        <ResponsiveDialog
+          open={showLayDown}
+          onOpenChange={handleLayDownClose}
+          title="Turun Meld"
+          description="Pilih min. 3 kartu dari tangan untuk diturunkan sebagai meld"
+        >
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 {hand.map((card) => {
@@ -154,8 +145,7 @@ export function HandArea() {
                 </div>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
+        </ResponsiveDialog>
       </CardContent>
     </Card>
   );

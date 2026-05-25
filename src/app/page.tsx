@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useGameStore } from "@/store/gameStore"
 import { GameSetup } from "@/components/setup/GameSetup"
 import { HandArea } from "@/components/hand/HandArea"
@@ -8,9 +9,11 @@ import { MeldTable } from "@/components/melds/MeldTable"
 import { RecommendationPanel } from "@/components/recommendation/RecommendationPanel"
 import { formatCard } from "@/engine/cards/cardUtils"
 import { Button } from "@/components/ui/button"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 
 export default function Home() {
   const { gamePhase, resetGame, jokerRank, jokerIndicator } = useGameStore()
+  const [showRecDrawer, setShowRecDrawer] = useState(false)
 
   if (gamePhase === "setup") {
     return (
@@ -25,7 +28,7 @@ export default function Home() {
   }
 
   return (
-    <main className="max-w-6xl mx-auto p-4 py-6">
+    <main className="max-w-6xl mx-auto p-4 py-6 pb-20 md:pb-6">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-xl font-bold">RemiSense AI</h1>
@@ -48,13 +51,35 @@ export default function Home() {
           <MeldTable />
         </div>
 
-        {/* Right column: Recommendation (1/3 width) */}
-        <div className="md:col-span-1">
+        {/* Right column: Recommendation (1/3 width) - desktop only */}
+        <div className="hidden md:block md:col-span-1">
           <div className="sticky top-4">
             <RecommendationPanel />
           </div>
         </div>
       </div>
+
+      {/* Mobile: floating button to open recommendation drawer */}
+      <div className="fixed bottom-4 left-0 right-0 flex justify-center md:hidden z-50">
+        <Button
+          onClick={() => setShowRecDrawer(true)}
+          className="shadow-lg rounded-full px-6"
+        >
+          Lihat Rekomendasi
+        </Button>
+      </div>
+
+      {/* Mobile: recommendation drawer */}
+      <Drawer open={showRecDrawer} onOpenChange={setShowRecDrawer}>
+        <DrawerContent className="max-h-[85vh] px-4 pb-6">
+          <DrawerHeader className="text-left px-0">
+            <DrawerTitle>Rekomendasi</DrawerTitle>
+          </DrawerHeader>
+          <div className="overflow-y-auto">
+            <RecommendationPanel />
+          </div>
+        </DrawerContent>
+      </Drawer>
     </main>
   )
 }

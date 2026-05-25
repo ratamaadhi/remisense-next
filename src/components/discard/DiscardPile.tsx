@@ -7,7 +7,7 @@ import { CardPicker } from "@/components/hand/CardPicker"
 import { DiscardPickupFlow } from "./DiscardPickupFlow"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog"
 import { formatCard } from "@/engine/cards/cardUtils"
 import type { Card as CardType } from "@/types"
 
@@ -93,19 +93,14 @@ export function DiscardPile() {
           </div>
         )}
 
-        <Dialog open={showPicker} onOpenChange={setShowPicker}>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Pilih Kartu</DialogTitle>
-            </DialogHeader>
+        <ResponsiveDialog open={showPicker} onOpenChange={setShowPicker} title="Pilih Kartu">
             <CardPicker
               onSelect={(card: CardType) => addToDiscardPile(card)}
               onClose={() => setShowPicker(false)}
               onDeselect={removeInitialDiscard}
               deselectableCards={discardPile}
             />
-          </DialogContent>
-        </Dialog>
+        </ResponsiveDialog>
 
         {pickupMode && (
           <DiscardPickupFlow

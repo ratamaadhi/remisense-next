@@ -6,7 +6,7 @@ import { CardChip } from "@/components/hand/CardChip"
 import { CardPicker } from "@/components/hand/CardPicker"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog"
 import type { Card as CardType } from "@/types"
 
 export function MeldTable() {
@@ -58,19 +58,14 @@ export function MeldTable() {
           + Tambah Grup Meld
         </Button>
 
-        <Dialog open={showPicker} onOpenChange={setShowPicker}>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Pilih Kartu (min. 3)</DialogTitle>
-            </DialogHeader>
+        <ResponsiveDialog open={showPicker} onOpenChange={setShowPicker} title="Pilih Kartu (min. 3)">
             <CardPicker
               onSelect={() => {}}
               onClose={() => setShowPicker(false)}
               multiSelect={true}
               onMultiSelect={(cards: CardType[]) => addMeldGroup(cards)}
             />
-          </DialogContent>
-        </Dialog>
+        </ResponsiveDialog>
       </CardContent>
     </Card>
   )
