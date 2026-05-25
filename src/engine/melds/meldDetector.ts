@@ -35,6 +35,10 @@ export function detectSets(hand: Card[], jokerRank: number | null): Meld[] {
   for (const [, cards] of byRank) {
     if (cards.length >= 3) {
       melds.push({ cards: [...cards], type: "set" })
+      // Also generate a joker-extended set if joker is available
+      if (jokers.length > 0) {
+        melds.push({ cards: [...cards, jokers[0]], type: "set" })
+      }
     } else if (cards.length === 2 && jokers.length > 0) {
       melds.push({ cards: [...cards, jokers[0]], type: "set" })
     }

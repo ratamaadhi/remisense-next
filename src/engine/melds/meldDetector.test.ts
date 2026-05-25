@@ -48,6 +48,24 @@ describe("detectSets", () => {
     expect(sets).toHaveLength(1)
     expect(sets[0].cards).toHaveLength(3)
   })
+
+  it("extends a valid 3-card set to 4-card set using joker", () => {
+    // KH, KD, KC already form a valid set — joker (JS, rank 11) should extend to 4-card set
+    const hand: Card[] = [
+      { suit: "spade", rank: 2 },
+      { suit: "spade", rank: 3 },
+      { suit: "spade", rank: 4 },
+      { suit: "heart", rank: 13 },   // KH
+      { suit: "diamond", rank: 13 }, // KD
+      { suit: "club", rank: 13 },    // KC
+      { suit: "spade", rank: 11 },   // JS — joker rank = 11
+    ]
+    const sets = detectSets(hand, 11)
+    // Should detect both the 3-card set AND the 4-card set with joker
+    const fourCardSet = sets.find((s) => s.cards.length === 4)
+    expect(fourCardSet).toBeDefined()
+    expect(fourCardSet!.type).toBe("set")
+  })
 })
 
 describe("detectSequences", () => {
