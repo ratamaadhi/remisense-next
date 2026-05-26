@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <main className="flex-1">{children}</main>
           <footer className="border-t py-3 text-center text-xs text-muted-foreground">
-            <p>Dibuat oleh Ratama Adhi</p>
+            <p>Dibuat oleh ratamaadhi</p>
           </footer>
         </ThemeProvider>
       </body>
