@@ -79,3 +79,37 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
+## Project Context (updated 2026-05-26)
+
+**RemiSense** — AI decision support untuk permainan kartu Remi Indonesia.
+
+### Stack
+- Next.js 16.2.6, React 19.2.4, TypeScript, Tailwind 4, Shadcn, Zustand 5
+- Vitest (112 tests, semua pass per 2026-05-26)
+
+### Engine modules (src/engine/)
+- `cards/cardUtils` — card utilities
+- `melds/meldDetector` — deteksi set & sequence (termasuk joker wildcard)
+- `solver/combinationSolver` — backtracking optimal meld allocation
+- `heuristics/heuristicEvaluator` — scoring: (comboPotential×40)+(completionChance×30)+(flexibility×20)-(deadRisk×25)-(highPointPenalty×10)
+- `probability/probabilityTracker` — estimasi kartu tersisa
+- `recommendation/recommendationEngine` — output rekomendasi final
+
+### Key types (src/types/index.ts)
+- `Card { suit, rank }` — rank: 1=A, 11=J, 12=Q, 13=K
+- `Meld`, `NearMeld`, `MeldAllocation`, `Recommendation`, `GameContext`
+- `DiscardPickupOption` & `DiscardPickupRecommendation` — analisis ambil dari tumpukan buangan
+
+### Joker mechanism
+Bukan kartu joker terpisah. Ditentukan awal game: satu kartu diambil blind, semua kartu rank sama jadi wildcard (4 joker total).
+
+### UI components (src/components/)
+`hand/`, `discard/`, `melds/`, `setup/`, `recommendation/`, `panduan/`
+
+### Prinsip engineering
+- Pure functions, engine framework-independent
+- No LLM/ML — deterministic heuristics only
+- Offline-capable, target <200ms per rekomendasi
