@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import type { Card as CardType } from "@/types";
+import Link from "next/link";
+import { BookOpen } from "lucide-react";
 
 type SetupStep = "playerCount" | "hand" | "initialDiscard" | "joker" | "done";
 
@@ -264,6 +266,14 @@ export function GameSetup() {
             />
         </ResponsiveDialog>
       </CardContent>
+      <div className="mt-6 text-center">
+        <Link href="/panduan">
+          <Button variant="outline" size="sm">
+            <BookOpen className="h-4 w-4 mr-2" />
+            Cara Bermain Remi
+          </Button>
+        </Link>
+      </div>
     </Card>
   );
 }

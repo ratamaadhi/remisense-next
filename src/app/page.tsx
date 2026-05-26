@@ -11,6 +11,8 @@ import { formatCard } from "@/engine/cards/cardUtils";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import Link from "next/link";
+import { BookOpen } from "lucide-react";
 
 export default function Home() {
   const { gamePhase, resetGame, jokerRank, jokerIndicator } = useGameStore();
@@ -19,7 +21,13 @@ export default function Home() {
   if (gamePhase === "setup") {
     return (
       <main className="max-w-2xl mx-auto p-4 py-8">
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end gap-2 mb-4">
+          <Link href="/panduan">
+            <Button variant="ghost" size="sm">
+              <BookOpen className="h-4 w-4 mr-1" />
+              Panduan
+            </Button>
+          </Link>
           <ThemeToggle />
         </div>
         <h1 className="text-2xl font-bold text-center mb-2">RemiSense</h1>
@@ -43,6 +51,12 @@ export default function Home() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/panduan">
+            <Button variant="ghost" size="sm">
+              <BookOpen className="h-4 w-4 mr-1" />
+              <span className="hidden sm:inline">Panduan</span>
+            </Button>
+          </Link>
           <ThemeToggle />
           <Button variant="destructive" size="sm" onClick={resetGame}>
             Reset Permainan
