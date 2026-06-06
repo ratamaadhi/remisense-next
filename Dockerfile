@@ -1,28 +1,31 @@
-# Stage 1: Build
-FROM node:20.19-alpine AS builder
+FROM node:20.19-alpine AS base
 
+FROM base AS deps
 WORKDIR /app
-
-# Install dependencies
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copy source and build
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-# Stage 2: Serve with Nginx
-FROM nginx:1.27-alpine AS runner
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy static build output
-COPY --from=builder /app/out /usr/share/nginx/html
+USER nextjs
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node", "server.js"]
